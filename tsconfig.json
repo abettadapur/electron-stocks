@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.settings.json",
+  "compilerOptions": {
+    "composite": false,
+    "declarationMap": false,
+    "noEmit": true,
+    "emitDeclarationOnly": false
+  },
+  "references": [
+    { "path": "packages/bridge" },
+    { "path": "packages/frontend" },
+    { "path": "packages/main" }
+  ],
+  "include": ["scripts/**/*", "typings/**/*"]
+}

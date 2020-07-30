@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.settings.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "lib",
+    "target": "es2020",
+    "lib": ["dom", "ESNext.BigInt"],
+    "allowJs": true,
+    "paths": {
+      "frontend/*": ["src/*"]
+    }
+  },
+  "references": [],
+  "include": ["src/**/*", "typings/**/*", "../../typings/**/*"],
+  "exclude": ["node_modules"]
+}

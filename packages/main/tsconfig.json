@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.settings.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "lib",
+    "target": "ES2018",
+    "paths": {
+      "main/*": ["src/*"]
+    }
+  },
+  "references": [],
+  "include": ["src/**/*", "typings/**/*", "../../typings/**/*"],
+  "exclude": ["node_modules"]
+}
