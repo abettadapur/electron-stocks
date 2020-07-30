@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import createStore from "frontend/tasks/redux/createStore";
-import Tasks from "./tasks/ui/Tasks";
+import Tasks from "frontend/tasks/ui/Tasks";
 
 function TasksRoot(props: { store: any }) {
   return (
