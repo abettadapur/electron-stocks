@@ -4,6 +4,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "electron-devtools-installer": "^3.1.1",
     "electron-log": "^4.2.2"
   }
 }
