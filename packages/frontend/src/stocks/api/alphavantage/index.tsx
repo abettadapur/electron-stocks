@@ -4,7 +4,7 @@ import StockQuote from "./models/StockQuote";
 export async function getStockQuote(ticker: string): Promise<StockQuote> {
   const json = await makeApiRequest({
     function: "GLOBAL_QUOTE",
-    symbol: "AAPL",
+    symbol: ticker,
   });
   const stockQuote = StockQuote.fromApiModel(json);
 

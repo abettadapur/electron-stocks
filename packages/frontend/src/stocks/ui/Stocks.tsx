@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { getStockQuote } from "../api/alphavantage";
 
 export default function Stocks() {
-  useEffect(async () => {
-    console.log(await getStockQuote("AAPL"));
+  const [quote, setQuote] = useState("");
+  useEffect(() => {
+    getStockQuote("MSFT").then((quote) => setQuote(JSON.stringify(quote)));
   });
-  return <div>HelloWorld</div>;
+  return <div>{quote}</div>;
 }
