@@ -19,10 +19,11 @@ export default function Stocks() {
 }
 
 const grid = {
-  display: 'grid',
-  gridTemplateColumns: '200px minmax(400px, auto)', minHeight: 600
+  display: "grid",
+  gridTemplateColumns: "200px minmax(400px, auto)",
+  minHeight: 600,
 };
 
 const gridCell = {
-  border: '1px solid black'
+  border: "1px solid black",
 };
