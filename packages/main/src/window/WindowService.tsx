@@ -25,12 +25,12 @@ export class __WindowService {
 
     this._windows[win.id] = win;
 
-    const htmlFileName = `tasks.html`;
+    const htmlFileName = `stocks.html`;
     const htmlPath = path.resolve(htmlDir, htmlFileName);
 
     win.loadFile(htmlPath, {
       // Pass the name of the desired route via URL. See frontend/index.js
-      hash: "tasks",
+      hash: "stocks",
       // query: { ...query, ...(partitionId ? { partitionId } : {}) },
     });
 

@@ -1,11 +1,8 @@
 {
-  "name": "@tarchon/main",
+  "name": "@electron-stocks/main",
   "version": "1.0.0",
   "license": "MIT",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "dependencies": {
     "electron-log": "^4.2.2"
   }

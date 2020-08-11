@@ -1,5 +1,5 @@
 {
-  "name": "tarchon",
+  "name": "electron-stocks",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -7,6 +7,10 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "start": "npx electron packages/main/src/main.dev.js",
+    "tsc": "tsc -b"
+  },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.8.4",

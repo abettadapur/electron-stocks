@@ -1,0 +1,10 @@
+{
+    "name": "@electron-stocks/frontend",
+    "version": "1.0.0",
+    "license": "MIT",
+    "private": true,
+    "dependencies": {
+      "electron-log": "^4.2.2"
+    }
+  }
+  
