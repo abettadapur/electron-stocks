@@ -1,17 +1,18 @@
-import React from 'react';
-import MenuBarButton from './MenuBarButton';
+import React from "react";
+import MenuBarButton from "./MenuBarButton";
+import View from "../../view/View";
+import styled from "frontend/styled";
+
+const MenuBarContainer = styled(View)({
+  flexDirection: "row",
+  height: 50,
+});
 
 export default function MenuBar() {
   return (
-    <div style={flexRow}>
-      <MenuBarButton text='Stocks' />
-      <MenuBarButton text='My Finances' />
-    </div>
-  )
+    <MenuBarContainer>
+      <MenuBarButton text="Stocks" />
+      <MenuBarButton text="My Finances" />
+    </MenuBarContainer>
+  );
 }
-
-const flexRow = {
-  display: 'flex',
-  flexDirection: 'row' as 'row',
-  height: 50
-};
