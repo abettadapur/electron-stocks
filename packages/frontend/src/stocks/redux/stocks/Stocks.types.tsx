@@ -1,8 +1,9 @@
 export type StocksState = {
-  foo: string;
   menuBar: {
     menuItem: string;
   };
+
+  watchlist: string[];
 };
 
 export type StocksAwareState = {

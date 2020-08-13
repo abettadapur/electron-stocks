@@ -3,15 +3,21 @@ import { StocksState } from "./Stocks.types";
 import { StocksAction, StocksActions } from "./StocksActions";
 
 const StocksReducer = makeReducer(
-  { foo: "", menuBar: { menuItem: 'Stocks' } },
+  { watchlist: [], menuBar: { menuItem: "stocks" } },
   (state: StocksState, action: StocksAction) => {
     switch (action.type) {
-      case StocksActions.foo.type: {
-        state.foo = action.payload.fooPayload;
-        break;
-      }
       case StocksActions.menuSelect.type: {
         state.menuBar.menuItem = action.payload.menuSelectPayload;
+        break;
+      }
+
+      case StocksActions.addTickerToWatchlist.type: {
+        state.watchlist.push(action.payload.ticker);
+        break;
+      }
+
+      case StocksActions.setWatchlist.type: {
+        state.watchlist = action.payload.watchlist;
         break;
       }
     }

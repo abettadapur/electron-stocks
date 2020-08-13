@@ -10,6 +10,16 @@ export const StocksActions = {
       menuSelectPayload,
     })
   ),
+
+  addTickerToWatchlist: actionCreator(
+    "stocks/addTickerToWatchlist" as const,
+    (ticker: string) => ({ ticker })
+  ),
+
+  setWatchlist: actionCreator(
+    "stocks/setWatchlist" as const,
+    (watchlist: string[]) => ({ watchlist })
+  ),
 };
 
 export type StocksAction = ActionsUnion<typeof StocksActions>;
