@@ -1,6 +1,6 @@
 import React, { useMemo, StrictMode } from "react";
 import createCache from "@emotion/cache";
-import { ThemeContext, CacheProvider } from "@emotion/core";
+import { ThemeContext, CacheProvider, Global } from "@emotion/core";
 import { ThemeContextProvider } from "./theme/Theme";
 
 export default function UIRoot(props: React.PropsWithChildren<{}>) {
@@ -9,6 +9,7 @@ export default function UIRoot(props: React.PropsWithChildren<{}>) {
   return (
     <StrictMode>
       <CacheProvider value={emotionCache}>
+        <Global styles={globalStyles} />
         <ThemeContext.Provider value={defaultTheme}>
           {props.children}
         </ThemeContext.Provider>
@@ -16,3 +17,17 @@ export default function UIRoot(props: React.PropsWithChildren<{}>) {
     </StrictMode>
   );
 }
+
+const globalStyles = {
+  "html, body, #root": {
+    height: "100vh",
+    width: "100vw",
+    margin: 0,
+    display: "flex",
+    fontFamily: "Segoe UI",
+    overflow: "hidden",
+    userSelect: "none",
+    cursor: "default",
+    padding: 0,
+  },
+};

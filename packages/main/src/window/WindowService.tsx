@@ -7,8 +7,6 @@ export class __WindowService {
   public createTasksWindow() {
     const win = new BrowserWindow({
       show: false,
-      frame: false,
-      titleBarStyle: "hidden",
       resizable: true, // Have this on by default, so Windows OS snaps correctly (https://github.com/electron/electron/issues/11568)
       webPreferences: {
         nativeWindowOpen: true,
