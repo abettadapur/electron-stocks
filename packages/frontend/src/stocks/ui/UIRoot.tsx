@@ -30,4 +30,4 @@ const globalStyles = {
     cursor: "default",
     padding: 0,
   },
-};
+} as const;

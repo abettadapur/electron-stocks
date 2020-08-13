@@ -8,13 +8,13 @@ import View from "./view/View";
 function Stocks(props: { menuItem: string }) {
   const [quote, setQuote] = useState("");
   useEffect(() => {
-    getIntradayQuote("MSFT").then((r) => setQuote(JSON.stringify(r)));
+    // getIntradayQuote("MSFT").then((r) => setQuote(JSON.stringify(r)));
   }, []);
 
   return (
     <div>
       <MenuBar />
-      {props.menuItem === "Stocks" && (
+      {props.menuItem === "stocks" && (
         <div style={grid}>
           <div style={gridCell}>Watchlist</div>
           <div style={gridCell}>Stock Info Pane</div>

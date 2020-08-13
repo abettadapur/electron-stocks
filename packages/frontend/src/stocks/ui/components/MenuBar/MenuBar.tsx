@@ -1,30 +1,36 @@
 import React from "react";
-import MenuBarButton from "./MenuBarButton";
-import View from "../../view/View";
-import styled from "frontend/styled";
 import { connect } from "react-redux";
-import { StocksState } from "../../../redux/stocks/Stocks.types";
+import { StocksAwareState } from "../../../redux/stocks/Stocks.types";
+import Pivot from "../../pivot/Pivot";
+import { StocksActions } from "frontend/stocks/redux/stocks/StocksActions";
 
-interface MenuBarProps {
+type MappedProps = {
   selected: string;
-}
+};
 
-const MenuBarContainer = styled(View)({
-  flexDirection: "row",
-  height: 50,
-});
+type Props = MappedProps & typeof Actions;
 
-function MenuBar(props: MenuBarProps) {
+function MenuBar(props: Props) {
+  const { selectItem, selected } = props;
+
   return (
-    <MenuBarContainer>
-      <MenuBarButton text="Stocks" selected={props.selected === 'Stocks'} />
-      <MenuBarButton text="My Finances" selected={props.selected === 'My Finances'} />
-    </MenuBarContainer>
+    <Pivot
+      pivotItems={[
+        { key: "stocks", title: "Stocks" },
+        { key: "finances", title: "My Finances" },
+      ]}
+      selectedKey={selected}
+      onItemSelected={(key) => selectItem(key)}
+    />
   );
 }
 
-const mapStateToProps = (state: StocksState) => ({
-  selected: state.stocks.menuBar.menuItem
+const mapStateToProps = (state: StocksAwareState): MappedProps => ({
+  selected: state.stocks.menuBar.menuItem,
 });
 
-export default connect(mapStateToProps)(MenuBar);
+const Actions = {
+  selectItem: StocksActions.menuSelect,
+};
+
+export default connect(mapStateToProps, Actions)(MenuBar);
