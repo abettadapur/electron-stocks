@@ -1,38 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { getEODStockQuote, getIntradayQuote } from "../api/tiingo";
+import React from "react";
 import MenuBar from "./components/MenuBar/MenuBar";
 import { connect } from "react-redux";
 import { StocksState, StocksAwareState } from "../redux/stocks/Stocks.types";
+import StocksView from "./components/stocksView/StocksView";
 import View from "./view/View";
 
 function Stocks(props: { menuItem: string }) {
-  const [quote, setQuote] = useState("");
-  useEffect(() => {
-    // getIntradayQuote("MSFT").then((r) => setQuote(JSON.stringify(r)));
-  }, []);
-
   return (
-    <div>
+    <View style={{ flex: 1 }}>
       <MenuBar />
-      {props.menuItem === "stocks" && (
-        <div style={grid}>
-          <div style={gridCell}>Watchlist</div>
-          <div style={gridCell}>Stock Info Pane</div>
-        </div>
-      )}
-    </div>
+      {props.menuItem === "stocks" && <StocksView />}
+    </View>
   );
 }
-
-const grid = {
-  display: "grid",
-  gridTemplateColumns: "200px minmax(400px, auto)",
-  minHeight: 600,
-};
-
-const gridCell = {
-  border: "1px solid black",
-};
 
 const mapStateToProps = (state: StocksAwareState) => ({
   menuItem: state.stocks.menuBar.menuItem,

@@ -3,7 +3,7 @@ import { getSagaExtension } from "redux-dynamic-modules-saga";
 import StocksModule from "./stocks/StocksModule";
 
 export default function createTasksStore() {
-  return createStore(
+  const store = createStore(
     {
       initialState: {},
       extensions: [getSagaExtension(undefined, () => {})],
@@ -11,4 +11,10 @@ export default function createTasksStore() {
     // @ts-ignore These types are all fucked, whatever
     StocksModule
   );
+
+  /// expose for debugging
+  // @ts-ignore
+  window.__store = store;
+
+  return store;
 }

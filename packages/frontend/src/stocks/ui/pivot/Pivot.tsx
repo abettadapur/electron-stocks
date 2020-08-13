@@ -43,7 +43,6 @@ export default function Pivot(props: Props) {
   useEffect(() => {
     const pivotItemElement = pivotItemRefs.current[selectedKey];
     if (pivotItemElement) {
-      //   const boundingRect = pivotItemElement.getBoundingClientRect();
       const width = pivotItemElement.clientWidth;
       const left = pivotItemElement.offsetLeft;
       const transform = `translateX(${left - 1}px)`;

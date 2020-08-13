@@ -18,10 +18,14 @@ function* loadWatchlist() {
     try {
       const watchlist = JSON.parse(savedWatchlistJSON);
       yield put(StocksActions.setWatchlist(watchlist));
+
+      return watchlist;
     } catch (e) {
       yield call([localStorage, localStorage.removeItem], "watchlist");
     }
   }
+
+  return [];
 }
 
 function* saveWatchlist() {
