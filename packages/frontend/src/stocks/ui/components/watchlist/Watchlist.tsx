@@ -1,10 +1,11 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { StocksActions } from "frontend/stocks/redux/stocks/StocksActions";
 import { StocksAwareState } from "frontend/stocks/redux/stocks/Stocks.types";
 import { getWatchlist } from "frontend/stocks/redux/stocks/StocksSelectors";
 import View from "../../view/View";
 import styled from "../../../../styled";
+import { getQuotesForWatchlist } from "frontend/stocks/api/tiingo";
 
 type MappedProps = {
   watchlist: string[];
@@ -25,6 +26,7 @@ function Watchlist(props: Props) {
   const { addToWatchlist, watchlist } = props;
 
   const [inputValue, setInputValue] = useState("");
+  const [quotes, setQuotes] = useState({});
 
   const onInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,6 +40,16 @@ function Watchlist(props: Props) {
     setInputValue("");
   }, [inputValue, setInputValue]);
 
+  useEffect(() => {
+    getQuotesForWatchlist(watchlist).then((resp) => {
+      let newQuotes = {};
+      resp.forEach((quote) => {
+        newQuotes[quote.symbol] = quote.price
+      });
+      setQuotes(newQuotes);
+    })
+  }, [watchlist]);
+
   return (
     <WatchlistContainer>
       <InputContainer>
@@ -45,7 +57,7 @@ function Watchlist(props: Props) {
         <button onClick={onAddTicker}>Add Ticker</button>
       </InputContainer>
       {watchlist.map((w) => (
-        <View>{w}</View>
+        <View>{w} {quotes[w.toUpperCase()]}</View>
       ))}
     </WatchlistContainer>
   );

@@ -14,3 +14,7 @@ export async function getIntradayQuote(ticker: string) {
 
   return intradayQuote;
 }
+
+export async function getQuotesForWatchlist(watchlist: string[]) {
+  return Promise.all(watchlist.map(ticker => getIntradayQuote(ticker)));
+}
