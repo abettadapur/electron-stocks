@@ -44,7 +44,7 @@ const DeleteButton = styled.button({
 });
 
 function Watchlist(props: Props) {
-  const { addToWatchlist, removeFromWatchlist, watchlist } = props;
+  const { addToWatchlist, removeFromWatchlist, setSelectedStock, watchlist } = props;
 
   const [inputValue, setInputValue] = useState("");
   const [quotes, setQuotes] = useState({});
@@ -63,6 +63,11 @@ function Watchlist(props: Props) {
     setInputValue("");
   }, [inputValue, setInputValue]);
 
+  const onRemoveTicker = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>, w: string) => {
+    removeFromWatchlist(w);
+    e.stopPropagation();
+  }, [watchlist]);
+
   useEffect(() => {
     getQuotesForWatchlist(watchlist).then((resp) => {
       let newQuotes = {};
@@ -80,7 +85,7 @@ function Watchlist(props: Props) {
         <button onClick={onAddTicker}>Add Ticker</button>
       </Row>
       {watchlist.map((w, i) => (
-        <View key={i} onMouseOver={() => setHovered(i)}>
+        <View key={i} onMouseOver={() => setHovered(i)} onClick={() => setSelectedStock(w)}>
           <TallRow>
             <ColumnLarge>
               <View style={{ paddingLeft: 20 }}>
@@ -94,9 +99,9 @@ function Watchlist(props: Props) {
             </ColumnSmall>
             <ColumnSmall style={{ maxWidth: 20 }}>
               <View style={{ textAlign: 'end' as 'end', display: hovered === i ? 'block' : 'none' }}>
-                <DeleteButton onClick={() => removeFromWatchlist(w)}>
+                <DeleteButton onClick={(e) => { onRemoveTicker(e, w) }}>
                   X
-                  </DeleteButton>
+                </DeleteButton>
               </View>
             </ColumnSmall>
           </TallRow>
@@ -109,6 +114,7 @@ function Watchlist(props: Props) {
 const Actions = {
   addToWatchlist: StocksActions.addTickerToWatchlist,
   removeFromWatchlist: StocksActions.removeTickerFromWatchlist,
+  setSelectedStock: StocksActions.setSelectedStock
 };
 
 function mapStateToProps(state: StocksAwareState): MappedProps {

@@ -3,7 +3,7 @@ import { StocksState } from "./Stocks.types";
 import { StocksAction, StocksActions } from "./StocksActions";
 
 const StocksReducer = makeReducer(
-  { watchlist: [], menuBar: { menuItem: "stocks" } },
+  { watchlist: [], menuBar: { menuItem: "stocks" }, selected: '' },
   (state: StocksState, action: StocksAction) => {
     switch (action.type) {
       case StocksActions.menuSelect.type: {
@@ -23,6 +23,11 @@ const StocksReducer = makeReducer(
 
       case StocksActions.setWatchlist.type: {
         state.watchlist = action.payload.watchlist;
+        break;
+      }
+
+      case StocksActions.setSelectedStock.type: {
+        state.selected = action.payload.ticker;
         break;
       }
     }

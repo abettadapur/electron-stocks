@@ -25,6 +25,11 @@ export const StocksActions = {
     "stocks/setWatchlist" as const,
     (watchlist: string[]) => ({ watchlist })
   ),
+
+  setSelectedStock: actionCreator(
+    "stocks/setSelectedStock" as const,
+    (ticker: string) => ({ ticker })
+  )
 };
 
 export type StocksAction = ActionsUnion<typeof StocksActions>;

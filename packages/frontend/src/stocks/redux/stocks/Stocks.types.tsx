@@ -4,6 +4,7 @@ export type StocksState = {
   };
 
   watchlist: string[];
+  selected: string;
 };
 
 export type StocksAwareState = {

@@ -2,6 +2,7 @@ import React from "react";
 import styled from "../../../../styled";
 import View from "../../view/View";
 import Watchlist from "../watchlist/Watchlist";
+import StockDetails from "../StockDetails/StockDetails";
 
 const StocksViewContainer = styled(View)({
   flexDirection: "row",
@@ -22,7 +23,9 @@ export default function StocksView() {
       <LeftContainer>
         <Watchlist></Watchlist>
       </LeftContainer>
-      <RightContainer>Stock Info Pane</RightContainer>
+      <RightContainer>
+        <StockDetails></StockDetails>
+      </RightContainer>
     </StocksViewContainer>
   );
 }
