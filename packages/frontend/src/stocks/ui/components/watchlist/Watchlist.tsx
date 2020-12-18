@@ -18,15 +18,38 @@ const WatchlistContainer = styled(View)({
   flex: 1,
 });
 
-const InputContainer = styled(View)({
+const Row = styled(View)({
   flexDirection: "row",
 });
 
+const TallRow = styled(Row)({
+  height: 60,
+  lineHeight: '60px',
+  fontSize: 20
+});
+
+const ColumnLarge = styled(View)({
+  flex: 2,
+  maxWidth: '40%'
+});
+
+const ColumnSmall = styled(View)({
+  flex: 1
+});
+
+const DeleteButton = styled.button({
+  height: 20,
+  background: 'Transparent',
+  border: 'none'
+});
+
 function Watchlist(props: Props) {
-  const { addToWatchlist, watchlist } = props;
+  const { addToWatchlist, removeFromWatchlist, watchlist } = props;
 
   const [inputValue, setInputValue] = useState("");
   const [quotes, setQuotes] = useState({});
+
+  const [hovered, setHovered] = useState(-1);
 
   const onInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,12 +75,32 @@ function Watchlist(props: Props) {
 
   return (
     <WatchlistContainer>
-      <InputContainer>
+      <Row>
         <input type="text" value={inputValue} onChange={onInputChange} />
         <button onClick={onAddTicker}>Add Ticker</button>
-      </InputContainer>
-      {watchlist.map((w) => (
-        <View>{w} {quotes[w.toUpperCase()]}</View>
+      </Row>
+      {watchlist.map((w, i) => (
+        <View key={i} onMouseOver={() => setHovered(i)}>
+          <TallRow>
+            <ColumnLarge>
+              <View style={{ paddingLeft: 20 }}>
+                {w}
+              </View>
+            </ColumnLarge>
+            <ColumnSmall>
+              <View style={{ textAlign: 'end' as 'end' }}>
+                {quotes[w.toUpperCase()]}
+              </View>
+            </ColumnSmall>
+            <ColumnSmall style={{ maxWidth: 20 }}>
+              <View style={{ textAlign: 'end' as 'end', display: hovered === i ? 'block' : 'none' }}>
+                <DeleteButton onClick={() => removeFromWatchlist(w)}>
+                  X
+                  </DeleteButton>
+              </View>
+            </ColumnSmall>
+          </TallRow>
+        </View>
       ))}
     </WatchlistContainer>
   );
@@ -65,6 +108,7 @@ function Watchlist(props: Props) {
 
 const Actions = {
   addToWatchlist: StocksActions.addTickerToWatchlist,
+  removeFromWatchlist: StocksActions.removeTickerFromWatchlist,
 };
 
 function mapStateToProps(state: StocksAwareState): MappedProps {

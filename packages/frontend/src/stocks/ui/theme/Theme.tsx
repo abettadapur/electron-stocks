@@ -5,6 +5,7 @@ export type Theme = {
   colors: {
     white: string;
     black: string;
+    gray: string;
   };
 };
 
@@ -12,6 +13,7 @@ const defaultTheme: Theme = {
   colors: {
     white: "#FFFFFF",
     black: "#000000",
+    gray: 'rgba(0, 0, 0, 0.3)'
   },
 };
 

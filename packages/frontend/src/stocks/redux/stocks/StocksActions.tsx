@@ -16,6 +16,11 @@ export const StocksActions = {
     (ticker: string) => ({ ticker })
   ),
 
+  removeTickerFromWatchlist: actionCreator(
+    "stocks/removeTickerFromWatchlist" as const,
+    (ticker: string) => ({ ticker })
+  ),
+
   setWatchlist: actionCreator(
     "stocks/setWatchlist" as const,
     (watchlist: string[]) => ({ watchlist })

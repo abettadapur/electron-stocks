@@ -16,6 +16,11 @@ const StocksReducer = makeReducer(
         break;
       }
 
+      case StocksActions.removeTickerFromWatchlist.type: {
+        state.watchlist.splice(state.watchlist.indexOf(action.payload.ticker.toLowerCase()), 1);
+        break;
+      }
+
       case StocksActions.setWatchlist.type: {
         state.watchlist = action.payload.watchlist;
         break;
