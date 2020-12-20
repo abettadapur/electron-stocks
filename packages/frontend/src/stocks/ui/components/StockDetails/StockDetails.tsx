@@ -4,6 +4,7 @@ import { StocksAwareState } from 'frontend/stocks/redux/stocks/Stocks.types';
 import View from "../../view/View";
 import { getIntradayQuote } from 'frontend/stocks/api/tiingo';
 import { IoMdArrowDropup } from 'react-icons/io';
+import HistoricalGraph from '../HistoricalGraph/HistoricalGraph';
 
 type Props = {
   selected: string;
@@ -40,6 +41,9 @@ function StockDetails(props: Props) {
             </span>
           </div>
         }
+      </View>
+      <View>
+        <HistoricalGraph selectedStock={selected} />
       </View>
     </View>
   )
