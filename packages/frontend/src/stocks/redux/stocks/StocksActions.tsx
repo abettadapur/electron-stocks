@@ -1,4 +1,5 @@
 import { ActionsUnion, actionCreator } from "../utils/actionUtils";
+import { Period } from "./Stocks.types";
 
 export const StocksActions = {
   foo: actionCreator("stocks/foo" as const, (fooPayload: string) => ({
@@ -29,6 +30,11 @@ export const StocksActions = {
   setSelectedStock: actionCreator(
     "stocks/setSelectedStock" as const,
     (ticker: string) => ({ ticker })
+  ),
+
+  setSelectedPeriod: actionCreator(
+    "stocks/setSelectedPeriod" as const,
+    (period: Period) => ({ period })
   )
 };
 

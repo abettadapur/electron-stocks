@@ -1,9 +1,9 @@
 import { makeReducer } from "../utils/reducerUtils";
-import { StocksState } from "./Stocks.types";
+import { StocksState, Period } from "./Stocks.types";
 import { StocksAction, StocksActions } from "./StocksActions";
 
 const StocksReducer = makeReducer(
-  { watchlist: [], menuBar: { menuItem: "stocks" }, selected: '' },
+  { watchlist: [], menuBar: { menuItem: "stocks" }, selected: '', selectedPeriod: '1d' as Period },
   (state: StocksState, action: StocksAction) => {
     switch (action.type) {
       case StocksActions.menuSelect.type: {
@@ -28,6 +28,11 @@ const StocksReducer = makeReducer(
 
       case StocksActions.setSelectedStock.type: {
         state.selected = action.payload.ticker;
+        break;
+      }
+
+      case StocksActions.setSelectedPeriod.type: {
+        state.selectedPeriod = action.payload.period;
         break;
       }
     }

@@ -5,8 +5,11 @@ export type StocksState = {
 
   watchlist: string[];
   selected: string;
+  selectedPeriod: Period;
 };
 
 export type StocksAwareState = {
   stocks: StocksState;
 };
+
+export type Period = '1d' | '5d' | '1m' | '6m' | 'ytd';
