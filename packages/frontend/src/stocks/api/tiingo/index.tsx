@@ -1,6 +1,8 @@
 import makeApiRequest from "./utils/makeApiRequest";
 import StockQuote from "./models/EODStockQuote";
 import IEXStockQuote from "./models/IEXStockQuote";
+import EODHistorical from "./models/EODHistorical";
+import { TiingoHistoricalPeriod } from "frontend/stocks/redux/stocks/Stocks.types";
 import IEXHistorical from "./models/IEXHistorical";
 
 export async function getEODStockQuote(ticker: string) {
@@ -20,11 +22,25 @@ export async function getQuotesForWatchlist(watchlist: string[]) {
   return Promise.all(watchlist.map(ticker => getIntradayQuote(ticker)));
 }
 
-export async function getHistoricalData(ticker: string, startDate: string, endDate: string, periodType: "min" | "hour", periodLength: Number) {
+export async function getEODHistoricalData(ticker: string, startDate: string, endDate: string, resampleFreq: TiingoHistoricalPeriod) {
+  const result = await makeApiRequest(`tiingo/daily/${ticker}/prices`, {
+    format: 'json',
+    startDate,
+    endDate,
+    resampleFreq
+  });
+  const historicalData = EODHistorical.fromApiModelList(result);
+  return historicalData;
+}
+
+export async function getIEXHistoricalData(ticker: string, startDate: string, endDate: string, period: string) {
+  let nums = period.match(/\d/);
+  const periodLength = nums ? nums[0] : 1;
+
   const result = await makeApiRequest(`iex/${ticker}/prices`, {
     startDate,
     endDate,
-    resampleFreq: `${periodLength}${periodType}`
+    resampleFreq: `${periodLength}min`
   });
   const historicalData = IEXHistorical.fromApiModelList(result);
   return historicalData;

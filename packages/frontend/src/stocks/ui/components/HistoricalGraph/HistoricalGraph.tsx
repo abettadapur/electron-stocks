@@ -2,7 +2,6 @@ import React, { useEffect, MutableRefObject } from 'react';
 import View from '../../view/View';
 import styled from "../../../../styled";
 import { drawAndFillGraphOnCanvas } from '../../Utils/graphUtils';
-import dayjs from 'dayjs';
 import { Period } from 'frontend/stocks/redux/stocks/Stocks.types';
 
 type Props = {
@@ -20,14 +19,11 @@ export default function HistoricalGraph(props: Props) {
   let { selectedStock, lastTradeDate, selectedPeriod } = props;
 
   const canvasRef = React.useRef() as MutableRefObject<HTMLCanvasElement>;
-
   useEffect(() => {
     if (selectedStock && lastTradeDate) {
-      const info = periodMap[selectedPeriod];
-      let startDate = dayjs(lastTradeDate).subtract(info.goBackDays, 'day');
-      drawAndFillGraphOnCanvas(selectedStock, startDate.format('MM-DD-YYYY'), lastTradeDate, info.freqPeriod, info.periodLength, canvasRef);
+      drawAndFillGraphOnCanvas(selectedStock, lastTradeDate, selectedPeriod, canvasRef);
     }
-  }, [selectedStock, selectedPeriod]);
+  }, [selectedStock, selectedPeriod, lastTradeDate]);
 
   return (
     <View>
@@ -36,9 +32,9 @@ export default function HistoricalGraph(props: Props) {
   );
 }
 
-const periodMap = {
-  '1d': { goBackDays: 0, freqPeriod: 'min', periodLength: 1 },
-  '5d': { goBackDays: 4, freqPeriod: 'min', periodLength: 5 },
-  '1m': { goBackDays: 29, freqPeriod: 'hour', periodLength: 1 },
-  '6m': { goBackDays: 179, freqPeriod: 'hour', periodLength: 4 }
-}
+// const periodMap = {
+//   '1d': { goBackDays: 0, freqPeriod: 'min', periodLength: 1 },
+//   '5d': { goBackDays: 4, freqPeriod: 'min', periodLength: 5 },
+//   '1m': { goBackDays: 29, freqPeriod: 'hour', periodLength: 1 },
+//   '6m': { goBackDays: 179, freqPeriod: 'hour', periodLength: 4 }
+// }

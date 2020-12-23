@@ -13,3 +13,5 @@ export type StocksAwareState = {
 };
 
 export type Period = '1d' | '5d' | '1m' | '6m' | 'ytd';
+
+export type TiingoHistoricalPeriod = 'daily' | 'weekly' | 'monthly' | 'annually';

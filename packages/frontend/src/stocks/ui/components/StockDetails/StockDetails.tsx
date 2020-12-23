@@ -23,11 +23,12 @@ function StockDetails(props: Props) {
       getIntradayQuote(selected).then((resp) => {
         setPrevClose(resp.prevClose);
         setPrice(resp.price);
-        setLastTradeDate(resp.timestamp.toLocaleDateString().replace("/", "-"))
+        setLastTradeDate(resp.timestamp.toLocaleDateString().replace(/\//, '-').replace(/\//, '-'));
       });
     }
   }, [selected]);
-  if (selected) {
+
+  if (selected && prevClose !== -1) {
     return (
       <View>
         <View>
