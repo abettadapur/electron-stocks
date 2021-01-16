@@ -1,11 +1,30 @@
+import dayjs from "dayjs";
+import {
+  getEODHistoricalData,
+  getIEXHistoricalData,
+  getIntradayQuote,
+} from "frontend/stocks/api/tiingo";
+import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
+import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
+import IEXStockQuote from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import { call, put, select, takeLatest } from "redux-saga/effects";
-import { StocksActions } from "./StocksActions";
-import { getWatchlist } from "./StocksSelectors";
+import { ActionOf } from "../utils/actionUtils";
+import { Period } from "./Stocks.types";
+import { StocksAction, StocksActions } from "./StocksActions";
+import { HISTORICAL_PERIOD_INFO } from "./StocksConstants";
+import {
+  getQuote,
+  getSelectedPeriod,
+  getSelectedTicker,
+  getWatchlist,
+} from "./StocksSelectors";
 
 export default function* StocksSaga() {
   yield call(loadWatchlist);
 
   yield takeLatest(StocksActions.addTickerToWatchlist.type, saveWatchlist);
+  yield takeLatest(StocksActions.setSelectedStock.type, onStockChanged);
+  yield takeLatest(StocksActions.setSelectedPeriod.type, onPeriodChanged);
 }
 
 function* loadWatchlist() {
@@ -36,4 +55,66 @@ function* saveWatchlist() {
     "watchlist",
     currentWatchlistJSON
   );
+}
+
+function* onStockChanged(
+  action: ActionOf<StocksAction, typeof StocksActions.setSelectedStock.type>
+) {
+  yield call(loadIntradayQuote, action.payload.ticker);
+  const selectedPeriod: Period = yield select(getSelectedPeriod);
+  yield call(loadHistoricalData, action.payload.ticker, selectedPeriod);
+}
+
+function* onPeriodChanged(
+  action: ActionOf<StocksAction, typeof StocksActions.setSelectedPeriod.type>
+) {
+  const currentTicker: string = yield select(getSelectedTicker);
+  yield call(loadHistoricalData, currentTicker, action.payload.period);
+}
+
+function* loadHistoricalData(ticker: string, period: Period) {
+  const mostRecentQuote: IEXStockQuote | undefined = yield select(
+    getQuote,
+    ticker
+  );
+  if (!mostRecentQuote) {
+    throw new Error("There must be a quote to load historical data");
+  }
+
+  const periodInfo = HISTORICAL_PERIOD_INFO[period];
+  if (period == "1d" || period == "5d") {
+    const startDate = dayjs(mostRecentQuote.timestamp)
+      .subtract(periodInfo.goBackDays, "day")
+      .format("MM-DD-YYYY");
+    const endDate = dayjs(mostRecentQuote.timestamp)
+      .add(1, "day")
+      .format("MM-DD-YYYY");
+
+    const historicalData: IEXHistorical[] = yield call(
+      getIEXHistoricalData,
+      ticker,
+      startDate,
+      endDate,
+      period
+    );
+    yield put(StocksActions.historicalLoaded(ticker, period, historicalData));
+  } else {
+    let startDate = dayjs(mostRecentQuote.timestamp)
+      .subtract(periodInfo.goBackDays, "day")
+      .format("MM-DD-YYYY");
+    let endDate = dayjs(mostRecentQuote.timestamp).format("MM-DD-YYYY");
+    const historicalData: EODHistorical[] = yield call(
+      getEODHistoricalData,
+      ticker,
+      startDate,
+      endDate,
+      "daily"
+    );
+    yield put(StocksActions.historicalLoaded(ticker, period, historicalData));
+  }
+}
+
+function* loadIntradayQuote(ticker: string) {
+  const quote: IEXStockQuote = yield call(getIntradayQuote, ticker);
+  yield put(StocksActions.quoteLoaded(ticker, quote));
 }
