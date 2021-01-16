@@ -21,7 +21,7 @@ function HistoricalGraph(props: Props) {
 
   const canvasRef = React.useRef() as MutableRefObject<HTMLCanvasElement>;
   useEffect(() => {
-    if (historicalData) {
+    if (historicalData && historicalData.length > 0) {
       drawGraph(historicalData, canvasRef);
     }
   }, [historicalData]);
