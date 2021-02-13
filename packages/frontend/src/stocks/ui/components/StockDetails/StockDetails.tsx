@@ -15,10 +15,15 @@ type Props = {
   selected: string;
   selectedPeriod: Period;
   lastQuote: IEXStockQuote | undefined;
+  tickerInvalid: boolean;
 };
 
 function StockDetails(props: Props) {
-  let { selected, lastQuote } = props;
+  let { selected, lastQuote, tickerInvalid } = props;
+
+  if (tickerInvalid) {
+    return <div>Ticker Invalid</div>
+  }
 
   if (!lastQuote || !selected) {
     return null;
@@ -64,6 +69,7 @@ const mapStateToProps = (state: StocksAwareState): Props => ({
   selected: state.stocks.selected,
   selectedPeriod: state.stocks.selectedPeriod,
   lastQuote: getQuote(state, state.stocks.selected),
+  tickerInvalid: state.stocks.tickerInvalid
 });
 
 export default connect(mapStateToProps)(StockDetails);

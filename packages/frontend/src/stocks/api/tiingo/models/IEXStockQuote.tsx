@@ -33,18 +33,21 @@ export default class IEXStockQuote {
     private _prevClose: number,
     private _volume: number,
     private _timestamp: Date
-  ) {}
+  ) { }
 
-  public static fromApiModel(model: object): IEXStockQuote {
-    return new IEXStockQuote(
-      model["ticker"],
-      model["open"],
-      model["high"],
-      model["low"],
-      model["last"],
-      model["prevClose"],
-      model["volume"],
-      new Date(Date.parse(model["timestamp"]))
-    );
+  public static fromApiModel(model: object): IEXStockQuote | void {
+    if (model) {
+      return new IEXStockQuote(
+        model["ticker"],
+        model["open"],
+        model["high"],
+        model["low"],
+        model["last"],
+        model["prevClose"],
+        model["volume"],
+        new Date(Date.parse(model["timestamp"]))
+      );
+    }
+    return undefined;
   }
 }
