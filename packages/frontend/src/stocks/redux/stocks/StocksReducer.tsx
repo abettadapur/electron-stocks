@@ -10,6 +10,7 @@ const StocksReducer = makeReducer(
     selectedPeriod: "1d" as Period,
     historicalData: {},
     quotes: {},
+    tickerInvalid: false
   },
   (state: StocksState, action: StocksAction) => {
     switch (action.type) {
@@ -65,6 +66,10 @@ const StocksReducer = makeReducer(
         state.historicalData[action.payload.ticker][action.payload.period] =
           action.payload.historical;
         break;
+      }
+
+      case StocksActions.setTickerInvalid.type: {
+        state.tickerInvalid = action.payload.invalid;
       }
     }
   }

@@ -77,8 +77,14 @@ function* loadHistoricalData(ticker: string, period: Period) {
     getQuote,
     ticker
   );
+
+  // Invalid ticker in search bar
   if (!mostRecentQuote) {
-    throw new Error("There must be a quote to load historical data");
+    yield put(StocksActions.setTickerInvalid(true));
+    return;
+    //throw new Error("There must be a quote to load historical data");
+  } else {
+    yield put(StocksActions.setTickerInvalid(false));
   }
 
   const periodInfo = HISTORICAL_PERIOD_INFO[period];

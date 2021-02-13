@@ -56,6 +56,10 @@ export const StocksActions = {
       historical,
     })
   ),
+  setTickerInvalid: actionCreator(
+    "stocks/tickerInvalid" as const,
+    (invalid: boolean) => ({ invalid })
+  )
 };
 
 export type StocksAction = ActionsUnion<typeof StocksActions>;

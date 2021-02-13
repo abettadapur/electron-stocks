@@ -13,6 +13,7 @@ export type StocksState = {
   watchlist: string[];
   selected: string;
   selectedPeriod: Period;
+  tickerInvalid: boolean;
 };
 
 export type StocksAwareState = {
