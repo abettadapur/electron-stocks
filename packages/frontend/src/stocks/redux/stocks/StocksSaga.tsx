@@ -18,13 +18,31 @@ import {
   getSelectedTicker,
   getWatchlist,
 } from "./StocksSelectors";
+import { w3cwebsocket } from 'websocket';
+
+let wsClient = new w3cwebsocket('wss://api.tiingo.com/iex', 'echo-protocol');
 
 export default function* StocksSaga() {
   yield call(loadWatchlist);
+  yield call(createSocket);
 
   yield takeLatest(StocksActions.addTickerToWatchlist.type, saveWatchlist);
   yield takeLatest(StocksActions.setSelectedStock.type, onStockChanged);
   yield takeLatest(StocksActions.setSelectedPeriod.type, onPeriodChanged);
+}
+
+function* createSocket() {
+  let subscribe = {
+    'eventName': 'subscribe',
+    'authorization': 'f3868f7ec3aae26d831fc2777efe8a6717135b61',
+    'eventData': {
+      'thresholdLevel': 5,
+      'tickers': ['spy', 'uso']
+    }
+  }
+  wsClient.onopen = () => {
+    console.log('OPEN');
+  }
 }
 
 function* loadWatchlist() {
