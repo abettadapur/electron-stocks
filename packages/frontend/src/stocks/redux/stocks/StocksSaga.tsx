@@ -7,7 +7,8 @@ import {
 import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
 import IEXStockQuote from "frontend/stocks/api/tiingo/models/IEXStockQuote";
-import { call, put, select, takeLatest } from "redux-saga/effects";
+import { eventChannel } from 'redux-saga';
+import { call, put, select, takeLatest, fork, take } from "redux-saga/effects";
 import { ActionOf } from "../utils/actionUtils";
 import { Period } from "./Stocks.types";
 import { StocksAction, StocksActions } from "./StocksActions";
@@ -18,31 +19,28 @@ import {
   getSelectedTicker,
   getWatchlist,
 } from "./StocksSelectors";
-import { w3cwebsocket } from 'websocket';
 
-let wsClient = new w3cwebsocket('wss://api.tiingo.com/iex', 'echo-protocol');
+function createSocketChannel() {
+  return eventChannel(emitter => {
+    const unsubscribe = window.bridge.addEventListener(emitter);
+    return unsubscribe;
+  });
+}
+
+function* listenToSocket(channel) {
+  while (true) {
+    const event = yield take(channel);
+  }
+}
 
 export default function* StocksSaga() {
   yield call(loadWatchlist);
-  yield call(createSocket);
+  const socketChannel = yield call(createSocketChannel);
+  yield fork(listenToSocket, socketChannel);
 
   yield takeLatest(StocksActions.addTickerToWatchlist.type, saveWatchlist);
   yield takeLatest(StocksActions.setSelectedStock.type, onStockChanged);
   yield takeLatest(StocksActions.setSelectedPeriod.type, onPeriodChanged);
-}
-
-function* createSocket() {
-  let subscribe = {
-    'eventName': 'subscribe',
-    'authorization': 'f3868f7ec3aae26d831fc2777efe8a6717135b61',
-    'eventData': {
-      'thresholdLevel': 5,
-      'tickers': ['spy', 'uso']
-    }
-  }
-  wsClient.onopen = () => {
-    console.log('OPEN');
-  }
 }
 
 function* loadWatchlist() {
