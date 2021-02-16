@@ -1,16 +1,17 @@
 import React, { useEffect, MutableRefObject, useState } from "react";
 import View from "../../view/View";
 import styled from "../../../../styled";
-import { StocksAwareState } from "frontend/stocks/redux/stocks/Stocks.types";
+import { StocksAwareState, Period } from "frontend/stocks/redux/stocks/Stocks.types";
 import { getSelectedHistoricalData } from "frontend/stocks/redux/stocks/StocksSelectors";
 import { connect } from "react-redux";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
 import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
-import { number } from "yargs";
-import { createWriteStream } from "fs-extra";
+import { HISTORICAL_PERIOD_INFO } from 'frontend/stocks/redux/stocks/StocksConstants';
+import { createProxyProxy } from "immer/dist/internal";
 
 type Props = {
   historicalData: IEXHistorical[] | EODHistorical[] | undefined;
+  period: Period;
 };
 
 type Point = { x: number; y: number };
@@ -21,13 +22,13 @@ const GraphCanvas = styled.canvas({
 });
 
 function HistoricalGraph(props: Props) {
-  let { historicalData } = props;
+  let { historicalData, period } = props;
   const [mousePoint, setMousePoint] = useState<Point | null>(null);
 
   const canvasRef = React.useRef() as MutableRefObject<HTMLCanvasElement>;
   useEffect(() => {
     if (historicalData && historicalData.length > 0) {
-      drawGraph(historicalData, mousePoint, canvasRef);
+      drawGraph(historicalData, period, mousePoint, canvasRef);
     }
   }, [historicalData, mousePoint]);
 
@@ -51,6 +52,7 @@ function HistoricalGraph(props: Props) {
 const mapStateToProps = (state: StocksAwareState) => {
   return {
     historicalData: getSelectedHistoricalData(state),
+    period: state.stocks.selectedPeriod
   };
 };
 
@@ -58,10 +60,22 @@ export default connect(mapStateToProps, null)(HistoricalGraph);
 
 function drawGraph(
   data: IEXHistorical[] | EODHistorical[],
+  selectedPeriod: Period,
   mousePoint: Point | null,
   canvasRef: React.MutableRefObject<HTMLCanvasElement>
 ) {
   const { min, max } = getMinMaxOverPeriod(data);
+  const periodInfo = HISTORICAL_PERIOD_INFO[selectedPeriod || '1d'];
+  const yDividerCount = periodInfo.yDividerCount;
+  let yDividers = [min];
+  let dividerHeight = (max - min) / (yDividerCount - 1);
+  debugger;
+  const isUp = data[data.length - 1].close > data[0].close;
+
+  for (var i = 0; i < yDividerCount - 2; i++) {
+    yDividers.push(min + (dividerHeight * (i + 1)));
+  }
+  yDividers.push(max);
 
   function priceToY(price: number) {
     const pixelsPerDollar = (canvasRef.current.height - 20) / (max - min); // vertical padding in canvas
@@ -102,7 +116,7 @@ function drawGraph(
   ctx?.setLineDash([]);
   data.forEach((point, index) => {
     ctx.lineWidth = "8";
-    ctx.strokeStyle = "green";
+    ctx.strokeStyle = isUp ? "green" : "red";
     const x = indexToX(index);
     const y = priceToY(point.close);
     if (!index) {
@@ -132,7 +146,13 @@ function drawGraph(
   ctx?.lineTo(canvasRef.current.width, canvasRef.current.height);
   ctx?.lineTo(0, canvasRef.current.height);
   ctx?.lineTo(indexToX(0), priceToY(data[0].close));
-  ctx.fillStyle = "lightgreen";
+
+  let grd = ctx.createLinearGradient(0, priceToY(max), 0, priceToY(min));
+  grd.addColorStop(0, "#a4dfb4");
+  grd.addColorStop(1, "white");
+
+  ctx.fillStyle = grd;
+
   ctx?.fill();
   ctx?.closePath();
 
@@ -151,6 +171,19 @@ function drawGraph(
     ctx.stroke();
     ctx.closePath();
   }
+
+  // Draw y dividers
+  yDividers.forEach((divider, i) => {
+    if (!(i === 0 || i === yDividers.length - 1)) {
+      ctx?.beginPath();
+      ctx.lineWidth = "3";
+      ctx.strokeStyle = "#dddddd";
+      ctx?.moveTo(0, priceToY(divider));
+      ctx?.lineTo(canvasRef.current.width, priceToY(divider));
+      ctx?.stroke();
+      ctx?.closePath();
+    }
+  });
 }
 
 function getMinMaxOverPeriod(
