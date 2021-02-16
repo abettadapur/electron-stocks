@@ -2,16 +2,18 @@ import React, { useEffect, MutableRefObject, useState } from "react";
 import View from "../../view/View";
 import styled from "../../../../styled";
 import { StocksAwareState, Period } from "frontend/stocks/redux/stocks/Stocks.types";
-import { getSelectedHistoricalData } from "frontend/stocks/redux/stocks/StocksSelectors";
+import { getSelectedHistoricalData, getQuote } from "frontend/stocks/redux/stocks/StocksSelectors";
 import { connect } from "react-redux";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
 import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import { HISTORICAL_PERIOD_INFO } from 'frontend/stocks/redux/stocks/StocksConstants';
 import { createProxyProxy } from "immer/dist/internal";
+import IEXStockQuote from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 
 type Props = {
   historicalData: IEXHistorical[] | EODHistorical[] | undefined;
   period: Period;
+  lastQuote: IEXStockQuote;
 };
 
 type Point = { x: number; y: number };
@@ -22,13 +24,13 @@ const GraphCanvas = styled.canvas({
 });
 
 function HistoricalGraph(props: Props) {
-  let { historicalData, period } = props;
+  let { historicalData, period, lastQuote } = props;
   const [mousePoint, setMousePoint] = useState<Point | null>(null);
 
   const canvasRef = React.useRef() as MutableRefObject<HTMLCanvasElement>;
   useEffect(() => {
     if (historicalData && historicalData.length > 0) {
-      drawGraph(historicalData, period, mousePoint, canvasRef);
+      drawGraph(historicalData, period, lastQuote, mousePoint, canvasRef);
     }
   }, [historicalData, mousePoint]);
 
@@ -52,7 +54,8 @@ function HistoricalGraph(props: Props) {
 const mapStateToProps = (state: StocksAwareState) => {
   return {
     historicalData: getSelectedHistoricalData(state),
-    period: state.stocks.selectedPeriod
+    period: state.stocks.selectedPeriod,
+    lastQuote: getQuote(state, state.stocks.selected),
   };
 };
 
@@ -61,6 +64,7 @@ export default connect(mapStateToProps, null)(HistoricalGraph);
 function drawGraph(
   data: IEXHistorical[] | EODHistorical[],
   selectedPeriod: Period,
+  lastQuote: IEXStockQuote,
   mousePoint: Point | null,
   canvasRef: React.MutableRefObject<HTMLCanvasElement>
 ) {
@@ -69,8 +73,7 @@ function drawGraph(
   const yDividerCount = periodInfo.yDividerCount;
   let yDividers = [min];
   let dividerHeight = (max - min) / (yDividerCount - 1);
-  debugger;
-  const isUp = data[data.length - 1].close > data[0].close;
+  const isUp = data[data.length - 1].close > lastQuote.prevClose;
 
   for (var i = 0; i < yDividerCount - 2; i++) {
     yDividers.push(min + (dividerHeight * (i + 1)));
@@ -148,7 +151,7 @@ function drawGraph(
   ctx?.lineTo(indexToX(0), priceToY(data[0].close));
 
   let grd = ctx.createLinearGradient(0, priceToY(max), 0, priceToY(min));
-  grd.addColorStop(0, "#a4dfb4");
+  grd.addColorStop(0, isUp ? "#a4dfb4" : "#ffbbbb");
   grd.addColorStop(1, "white");
 
   ctx.fillStyle = grd;
