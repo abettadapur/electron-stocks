@@ -88,9 +88,18 @@ function* loadHistoricalData(ticker: string, period: Period) {
   }
 
   const periodInfo = HISTORICAL_PERIOD_INFO[period];
+
+  let goBackDays;
+  // calc ytd days
+  if (typeof periodInfo.goBackDays === 'function') {
+    goBackDays = periodInfo.goBackDays();
+  } else {
+    goBackDays = periodInfo.goBackDays;
+  }
+
   if (period == "1d" || period == "5d") {
     const startDate = dayjs(mostRecentQuote.timestamp)
-      .subtract(periodInfo.goBackDays, "day")
+      .subtract(goBackDays, "day")
       .format("MM-DD-YYYY");
     const endDate = dayjs(mostRecentQuote.timestamp)
       .add(1, "day")
@@ -106,7 +115,7 @@ function* loadHistoricalData(ticker: string, period: Period) {
     yield put(StocksActions.historicalLoaded(ticker, period, historicalData));
   } else {
     let startDate = dayjs(mostRecentQuote.timestamp)
-      .subtract(periodInfo.goBackDays, "day")
+      .subtract(goBackDays, "day")
       .format("MM-DD-YYYY");
     let endDate = dayjs(mostRecentQuote.timestamp).format("MM-DD-YYYY");
     const historicalData: EODHistorical[] = yield call(

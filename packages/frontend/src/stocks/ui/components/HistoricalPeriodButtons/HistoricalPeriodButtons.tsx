@@ -4,6 +4,7 @@ import View from "../../view/View";
 import { connect } from "react-redux";
 import { StocksAwareState, Period } from 'frontend/stocks/redux/stocks/Stocks.types';
 import { StocksActions } from 'frontend/stocks/redux/stocks/StocksActions';
+import Pivot from '../../pivot/Pivot';
 
 type MappedProps = {
   selectedPeriod: Period;
@@ -19,18 +20,14 @@ const HistoricalPeriodSelector = styled(View)({
   flexDirection: 'row'
 });
 
-const HistoricalPeriodButton = styled.button({
-  textAlign: 'center',
-  flex: 1
-});
-
 function HistoricalPeriodButtons(props: Props) {
-  const { periods, setSelectedPeriod } = props;
+  const { periods, setSelectedPeriod, selectedPeriod } = props;
+  const pivotItems = periods.map(period => { return { key: period, title: period }; })
   return (
     <View>
       <HistoricalPeriodSelector>
         {
-          periods.map((period) => <HistoricalPeriodButton onClick={() => setSelectedPeriod(period)}>{period.toUpperCase()}</HistoricalPeriodButton>)
+          <Pivot pivotItems={pivotItems} selectedKey={selectedPeriod} onItemSelected={(key) => setSelectedPeriod(key as Period)} />
         }
       </HistoricalPeriodSelector>
     </View>

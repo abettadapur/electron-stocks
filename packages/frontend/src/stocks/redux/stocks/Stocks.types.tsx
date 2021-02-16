@@ -20,7 +20,7 @@ export type StocksAwareState = {
   stocks: StocksState;
 };
 
-export type Period = "1d" | "5d" | "1m" | "6m" | "ytd";
+export type Period = "1d" | "5d" | "1m" | "6m" | "ytd" | "1y" | "5y";
 
 export type TiingoHistoricalPeriod =
   | "daily"

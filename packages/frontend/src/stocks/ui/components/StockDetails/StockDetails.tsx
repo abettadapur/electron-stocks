@@ -58,7 +58,7 @@ function StockDetails(props: Props) {
       <View>
         <HistoricalGraph />
         <HistoricalPeriodButtons
-          periods={["1d", "5d", "1m", "6m", "ytd"]}
+          periods={["1d", "5d", "1m", "6m", "ytd", "1y", "5y"]}
         ></HistoricalPeriodButtons>
       </View>
     </View>

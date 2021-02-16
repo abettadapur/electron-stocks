@@ -40,7 +40,6 @@ function HistoricalGraph(props: Props) {
           setMousePoint({ x: e.clientX, y: e.clientY });
         }}
         onMouseDown={(e) => {
-          debugger;
         }}
         ref={canvasRef}
         style={{ border: "1px solid black" }}
@@ -102,7 +101,7 @@ function drawGraph(
   ctx.beginPath();
   ctx?.setLineDash([]);
   data.forEach((point, index) => {
-    ctx.lineWidth = "2";
+    ctx.lineWidth = "8";
     ctx.strokeStyle = "green";
     const x = indexToX(index);
     const y = priceToY(point.close);
