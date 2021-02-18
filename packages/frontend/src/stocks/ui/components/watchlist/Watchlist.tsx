@@ -94,16 +94,21 @@ function WatchlistCell(props: CellProps) {
   const price = quote?.price;
   let color = 'black';
 
-  if (price && prevPrice != price) {
-    if (prevPrice) {
-      color = price > prevPrice ? 'green' : 'red';
-      setTimeout(() => {
+  useEffect(() => {
+    if (price && prevPrice != price) {
+      if (prevPrice) {
+        setTimeout(() => {
+          setPrevPrice(price);
+        }, 1500);
+      }
+      else {
         setPrevPrice(price);
-      }, 1500);
+      }
     }
-    else {
-      setPrevPrice(price);
-    }
+  }, [price])
+
+  if (price && prevPrice && prevPrice != price) {
+    color = price > prevPrice ? 'green' : 'red';
   }
 
   return (
