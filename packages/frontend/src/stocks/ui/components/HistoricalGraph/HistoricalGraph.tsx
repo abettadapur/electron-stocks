@@ -8,7 +8,7 @@ import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
 import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import { HISTORICAL_PERIOD_INFO } from 'frontend/stocks/redux/stocks/StocksConstants';
 import { createProxyProxy } from "immer/dist/internal";
-import IEXStockQuote from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 
 type Props = {
   historicalData: IEXHistorical[] | EODHistorical[] | undefined;

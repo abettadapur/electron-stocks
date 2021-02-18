@@ -9,7 +9,7 @@ import { IoMdArrowDropup } from "react-icons/io";
 import HistoricalGraph from "../HistoricalGraph/HistoricalGraph";
 import HistoricalPeriodButtons from "../HistoricalPeriodButtons/HistoricalPeriodButtons";
 import { getQuote } from "frontend/stocks/redux/stocks/StocksSelectors";
-import IEXStockQuote from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 
 type Props = {
   selected: string;

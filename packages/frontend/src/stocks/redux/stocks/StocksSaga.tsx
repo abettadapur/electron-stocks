@@ -6,7 +6,8 @@ import {
 } from "frontend/stocks/api/tiingo";
 import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
-import IEXStockQuote from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import { SocketEvent, socketEventFromApiModel } from "frontend/stocks/api/tiingo/models/SocketEvent";
 import { eventChannel } from 'redux-saga';
 import { call, put, select, takeLatest, fork, take } from "redux-saga/effects";
 import { ActionOf } from "../utils/actionUtils";
@@ -30,14 +31,18 @@ function createSocketChannel() {
 function* listenToSocket(channel) {
   while (true) {
     const event = yield take(channel);
+    const socketEvent: SocketEvent = socketEventFromApiModel(JSON.parse(event));
+    if (socketEvent.data && (socketEvent.data.updateMessageType === 'T' || socketEvent.data.updateMessageType === 'Q')) {
+      yield put(StocksActions.updateQuoteWithSocketInfo(new Date(socketEvent.data.date), socketEvent.data.ticker, socketEvent.data.lastPrice))
+    }
   }
 }
 
 export default function* StocksSaga() {
-  yield call(loadWatchlist);
+  let watchlist = yield call(loadWatchlist);
+  yield call(window.bridge.createSocket, watchlist);
   const socketChannel = yield call(createSocketChannel);
   yield fork(listenToSocket, socketChannel);
-
   yield takeLatest(StocksActions.addTickerToWatchlist.type, saveWatchlist);
   yield takeLatest(StocksActions.setSelectedStock.type, onStockChanged);
   yield takeLatest(StocksActions.setSelectedPeriod.type, onPeriodChanged);
@@ -48,12 +53,11 @@ function* loadWatchlist() {
     [localStorage, localStorage.getItem],
     "watchlist"
   );
-
+  console.log(savedWatchlistJSON);
   if (savedWatchlistJSON) {
     try {
       const watchlist = JSON.parse(savedWatchlistJSON);
       yield put(StocksActions.setWatchlist(watchlist));
-
       return watchlist;
     } catch (e) {
       yield call([localStorage, localStorage.removeItem], "watchlist");
@@ -63,7 +67,7 @@ function* loadWatchlist() {
   return [];
 }
 
-function* saveWatchlist() {
+function* saveWatchlist(action: ActionOf<StocksAction, typeof StocksActions.addTickerToWatchlist.type>) {
   const currentWatchlist: string[] = yield select(getWatchlist);
   const currentWatchlistJSON = JSON.stringify(currentWatchlist);
   yield call(
@@ -71,6 +75,10 @@ function* saveWatchlist() {
     "watchlist",
     currentWatchlistJSON
   );
+
+  if (action && action.payload.ticker) {
+    yield call(window.bridge.addTicker, action.payload.ticker);
+  }
 }
 
 function* onStockChanged(
