@@ -9,7 +9,7 @@ import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import { SocketEvent, socketEventFromApiModel } from "frontend/stocks/api/tiingo/models/SocketEvent";
 import { eventChannel } from 'redux-saga';
-import { call, put, select, takeLatest, fork, take } from "redux-saga/effects";
+import { all, call, put, select, takeLatest, fork, take } from "redux-saga/effects";
 import { ActionOf } from "../utils/actionUtils";
 import { Period } from "./Stocks.types";
 import { StocksAction, StocksActions } from "./StocksActions";
@@ -43,6 +43,7 @@ export default function* StocksSaga() {
   yield call(window.bridge.createSocket, watchlist);
   const socketChannel = yield call(createSocketChannel);
   yield fork(listenToSocket, socketChannel);
+  yield call(loadQuotes, watchlist);
   yield takeLatest(StocksActions.addTickerToWatchlist.type, saveWatchlist);
   yield takeLatest(StocksActions.setSelectedStock.type, onStockChanged);
   yield takeLatest(StocksActions.setSelectedPeriod.type, onPeriodChanged);
@@ -53,7 +54,7 @@ function* loadWatchlist() {
     [localStorage, localStorage.getItem],
     "watchlist"
   );
-  console.log(savedWatchlistJSON);
+
   if (savedWatchlistJSON) {
     try {
       const watchlist = JSON.parse(savedWatchlistJSON);
@@ -75,6 +76,8 @@ function* saveWatchlist(action: ActionOf<StocksAction, typeof StocksActions.addT
     "watchlist",
     currentWatchlistJSON
   );
+
+  yield call(loadIntradayQuote, action.payload.ticker);
 
   if (action && action.payload.ticker) {
     yield call(window.bridge.addTicker, action.payload.ticker);
@@ -156,4 +159,8 @@ function* loadHistoricalData(ticker: string, period: Period) {
 function* loadIntradayQuote(ticker: string) {
   const quote: IEXStockQuote = yield call(getIntradayQuote, ticker);
   yield put(StocksActions.quoteLoaded(ticker, quote));
+}
+
+function* loadQuotes(tickers: string[]) {
+  yield all(tickers.map(ticker => call(loadIntradayQuote, ticker)));
 }

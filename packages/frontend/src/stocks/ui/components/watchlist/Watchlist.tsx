@@ -5,13 +5,21 @@ import { StocksAwareState } from "frontend/stocks/redux/stocks/Stocks.types";
 import { getWatchlist } from "frontend/stocks/redux/stocks/StocksSelectors";
 import View from "../../view/View";
 import styled from "../../../../styled";
-import { getQuotesForWatchlist } from "frontend/stocks/api/tiingo";
+import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import { getQuotes } from "frontend/stocks/redux/stocks/StocksSelectors";
 
 type MappedProps = {
   watchlist: string[];
+  quotes: { [ticker: string]: IEXStockQuote }
 };
 
 type Props = MappedProps & typeof Actions;
+
+type CellProps = {
+  ticker: string;
+  onRemoveClicked: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, w: string) => void;
+  quote: IEXStockQuote;
+}
 
 const WatchlistContainer = styled(View)({
   borderRight: "1px solid black",
@@ -44,12 +52,8 @@ const DeleteButton = styled.button({
 });
 
 function Watchlist(props: Props) {
-  const { addToWatchlist, removeFromWatchlist, setSelectedStock, watchlist } = props;
-
+  const { addToWatchlist, removeFromWatchlist, setSelectedStock, watchlist, quotes } = props;
   const [inputValue, setInputValue] = useState("");
-  const [quotes, setQuotes] = useState({});
-
-  const [hovered, setHovered] = useState(-1);
 
   const onInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,16 +72,6 @@ function Watchlist(props: Props) {
     e.stopPropagation();
   }, [watchlist]);
 
-  useEffect(() => {
-    getQuotesForWatchlist(watchlist).then((resp) => {
-      let newQuotes = {};
-      resp.forEach((quote) => {
-        newQuotes[quote.symbol] = quote.price
-      });
-      setQuotes(newQuotes);
-    })
-  }, [watchlist]);
-
   return (
     <WatchlistContainer>
       <Row>
@@ -85,30 +79,54 @@ function Watchlist(props: Props) {
         <button onClick={onAddTicker}>Add Ticker</button>
       </Row>
       {watchlist.map((w, i) => (
-        <View key={i} onMouseOver={() => setHovered(i)} onClick={() => setSelectedStock(w)}>
-          <TallRow>
-            <ColumnLarge>
-              <View style={{ paddingLeft: 20 }}>
-                {w}
-              </View>
-            </ColumnLarge>
-            <ColumnSmall>
-              <View style={{ textAlign: 'end' as 'end' }}>
-                {quotes[w.toUpperCase()]}
-              </View>
-            </ColumnSmall>
-            <ColumnSmall style={{ maxWidth: 20 }}>
-              <View style={{ textAlign: 'end' as 'end', display: hovered === i ? 'block' : 'none' }}>
-                <DeleteButton onClick={(e) => { onRemoveTicker(e, w) }}>
-                  X
-                </DeleteButton>
-              </View>
-            </ColumnSmall>
-          </TallRow>
+        <View key={i} onClick={() => setSelectedStock(w)}>
+          <WatchlistCell ticker={w} quote={quotes[w.toLowerCase()]} onRemoveClicked={onRemoveTicker} />
         </View>
       ))}
     </WatchlistContainer>
   );
+}
+
+function WatchlistCell(props: CellProps) {
+  const { ticker, quote, onRemoveClicked } = props;
+  const [isHovered, setIsHovered] = useState(false);
+  const [prevPrice, setPrevPrice] = useState(quote?.price);
+  const price = quote?.price;
+  let color = 'black';
+
+  if (price && prevPrice != price) {
+    if (prevPrice) {
+      color = price > prevPrice ? 'green' : 'red';
+      setTimeout(() => {
+        setPrevPrice(price);
+      }, 1500);
+    }
+    else {
+      setPrevPrice(price);
+    }
+  }
+
+  return (
+    <TallRow onMouseOver={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+      <ColumnLarge>
+        <View style={{ paddingLeft: 20 }}>
+          {ticker}
+        </View>
+      </ColumnLarge>
+      <ColumnSmall>
+        {price && <View style={{ textAlign: 'end' as 'end', color: color }}>
+          {price}
+        </View>}
+      </ColumnSmall>
+      <ColumnSmall style={{ maxWidth: 20 }}>
+        <View style={{ textAlign: 'end' as 'end', display: isHovered ? 'block' : 'none' }}>
+          {isHovered && <DeleteButton onClick={(e) => { onRemoveClicked(e, ticker) }}>
+            X
+        </DeleteButton>}
+        </View>
+      </ColumnSmall>
+    </TallRow>
+  )
 }
 
 const Actions = {
@@ -120,6 +138,7 @@ const Actions = {
 function mapStateToProps(state: StocksAwareState): MappedProps {
   return {
     watchlist: getWatchlist(state),
+    quotes: getQuotes(state)
   };
 }
 
