@@ -16,6 +16,10 @@ export function getQuote(state: StocksAwareState, ticker: string) {
   return state.stocks.quotes[ticker];
 }
 
+export function getQuotes(state: StocksAwareState) {
+  return state.stocks.quotes;
+}
+
 export function getSelectedHistoricalData(state: StocksAwareState) {
   return state.stocks.historicalData?.[getSelectedTicker(state)]?.[
     getSelectedPeriod(state)

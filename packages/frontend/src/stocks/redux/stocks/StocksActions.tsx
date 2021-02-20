@@ -1,6 +1,6 @@
 import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
-import IEXStockQuote from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import { ActionsUnion, actionCreator } from "../utils/actionUtils";
 import { Period } from "./Stocks.types";
 
@@ -59,6 +59,10 @@ export const StocksActions = {
   setTickerInvalid: actionCreator(
     "stocks/tickerInvalid" as const,
     (invalid: boolean) => ({ invalid })
+  ),
+  updateQuoteWithSocketInfo: actionCreator(
+    "stocks/updateQuoteWithSocketInfo" as const,
+    (date: Date, ticker: string, lastPrice: number) => ({ date, ticker, lastPrice })
   )
 };
 

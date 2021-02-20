@@ -1,6 +1,6 @@
 import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
-import IEXStockQuote from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 
 export type StocksState = {
   menuBar: {

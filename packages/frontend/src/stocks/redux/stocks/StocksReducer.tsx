@@ -70,6 +70,17 @@ const StocksReducer = makeReducer(
 
       case StocksActions.setTickerInvalid.type: {
         state.tickerInvalid = action.payload.invalid;
+        break;
+      }
+
+      case StocksActions.updateQuoteWithSocketInfo.type: {
+        if (action.payload.lastPrice != null && action.payload.lastPrice !== 0) {
+          if (!state.quotes[action.payload.ticker]) {
+            state.quotes[action.payload.ticker] = {};
+          }
+          state.quotes[action.payload.ticker].price = action.payload.lastPrice;
+        }
+
       }
     }
   }
