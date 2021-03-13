@@ -1,4 +1,4 @@
-import React, { useEffect, MutableRefObject, useState } from "react";
+import React, { useEffect, MutableRefObject, useState, useContext } from "react";
 import View from "../../view/View";
 import styled from "../../../../styled";
 import { StocksAwareState, Period } from "frontend/stocks/redux/stocks/Stocks.types";
@@ -9,6 +9,7 @@ import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import { HISTORICAL_PERIOD_INFO } from 'frontend/stocks/redux/stocks/StocksConstants';
 import { createProxyProxy } from "immer/dist/internal";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import { ThemeContext } from "@emotion/core";
 
 type Props = {
   historicalData: IEXHistorical[] | EODHistorical[] | undefined;
@@ -26,11 +27,12 @@ const GraphCanvas = styled.canvas({
 function HistoricalGraph(props: Props) {
   let { historicalData, period, lastQuote } = props;
   const [mousePoint, setMousePoint] = useState<Point | null>(null);
+  const currentTheme = useContext(ThemeContext);
 
   const canvasRef = React.useRef() as MutableRefObject<HTMLCanvasElement>;
   useEffect(() => {
     if (historicalData && historicalData.length > 0) {
-      drawGraph(historicalData, period, lastQuote, mousePoint, canvasRef);
+      drawGraph(historicalData, period, lastQuote, mousePoint, canvasRef, currentTheme);
     }
   }, [historicalData, mousePoint]);
 
@@ -66,7 +68,8 @@ function drawGraph(
   selectedPeriod: Period,
   lastQuote: IEXStockQuote,
   mousePoint: Point | null,
-  canvasRef: React.MutableRefObject<HTMLCanvasElement>
+  canvasRef: React.MutableRefObject<HTMLCanvasElement>,
+  currentTheme: any
 ) {
   const { min, max } = getMinMaxOverPeriod(data);
   const periodInfo = HISTORICAL_PERIOD_INFO[selectedPeriod || '1d'];
@@ -152,7 +155,7 @@ function drawGraph(
 
   let grd = ctx.createLinearGradient(0, priceToY(max), 0, priceToY(min));
   grd.addColorStop(0, isUp ? "#a4dfb4" : "#ffbbbb");
-  grd.addColorStop(1, "white");
+  grd.addColorStop(1, currentTheme.colors.stockDetails.background);
 
   ctx.fillStyle = grd;
 

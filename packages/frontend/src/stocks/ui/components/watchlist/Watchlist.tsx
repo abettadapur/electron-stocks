@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect, useContext } from "react";
 import { connect } from "react-redux";
 import { StocksActions } from "frontend/stocks/redux/stocks/StocksActions";
 import { StocksAwareState } from "frontend/stocks/redux/stocks/Stocks.types";
@@ -7,6 +7,8 @@ import View from "../../view/View";
 import styled from "../../../../styled";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import { getQuotes } from "frontend/stocks/redux/stocks/StocksSelectors";
+import { ThemeContext } from "@emotion/core";
+
 
 type MappedProps = {
   watchlist: string[];
@@ -23,7 +25,7 @@ type CellProps = {
 
 const WatchlistContainer = styled(View)({
   borderRight: "1px solid black",
-  flex: 1,
+  flex: 1
 });
 
 const Row = styled(View)({
@@ -92,7 +94,7 @@ function WatchlistCell(props: CellProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [prevPrice, setPrevPrice] = useState(quote?.price);
   const price = quote?.price;
-  let color = 'black';
+  let color = useContext(ThemeContext).colors.watchlist.fontColor;
 
   useEffect(() => {
     if (price && prevPrice != price) {

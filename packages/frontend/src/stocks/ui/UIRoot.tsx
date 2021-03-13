@@ -6,11 +6,26 @@ import { ThemeContextProvider } from "./theme/Theme";
 export default function UIRoot(props: React.PropsWithChildren<{}>) {
   const emotionCache = useMemo(() => createCache({ prefix: false }), []);
   const defaultTheme = useMemo(() => ({ colors: { black: "#000000" } }), []);
+
+  const darkTheme = useMemo(() => ({
+    colors: {
+      background: '#000000',
+      fontColor: '#ffffff',
+      watchlist: {
+        background: '#000000',
+        fontColor: '#ffffff'
+      },
+      stockDetails: {
+        background: '#252626',
+        fontColor: '#ffffff'
+      }
+    }
+  }), []);
   return (
     <StrictMode>
       <CacheProvider value={emotionCache}>
         <Global styles={globalStyles} />
-        <ThemeContext.Provider value={defaultTheme}>
+        <ThemeContext.Provider value={darkTheme}>
           {props.children}
         </ThemeContext.Provider>
       </CacheProvider>

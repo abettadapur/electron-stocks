@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { connect } from "react-redux";
 import {
   StocksAwareState,
@@ -10,6 +10,8 @@ import HistoricalGraph from "../HistoricalGraph/HistoricalGraph";
 import HistoricalPeriodButtons from "../HistoricalPeriodButtons/HistoricalPeriodButtons";
 import { getQuote } from "frontend/stocks/redux/stocks/StocksSelectors";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import { ThemeContext } from "@emotion/core";
+import styled from "../../../../styled";
 
 type Props = {
   selected: string;
@@ -17,6 +19,10 @@ type Props = {
   lastQuote: IEXStockQuote | undefined;
   tickerInvalid: boolean;
 };
+
+const StockDetailsWrapper = styled(View)<{ theme: any }>(props => ({
+  background: props.theme.background
+}));
 
 function StockDetails(props: Props) {
   let { selected, lastQuote, tickerInvalid } = props;
@@ -29,8 +35,9 @@ function StockDetails(props: Props) {
     return null;
   }
 
+  const currentTheme = useContext(ThemeContext)
   return (
-    <View>
+    <StockDetailsWrapper theme={currentTheme.colors.stockDetails}>
       <View>{props.selected}</View>
       <View>
         <div>
@@ -61,7 +68,7 @@ function StockDetails(props: Props) {
           periods={["1d", "5d", "1m", "6m", "ytd", "1y", "5y"]}
         ></HistoricalPeriodButtons>
       </View>
-    </View>
+    </StockDetailsWrapper>
   );
 }
 
