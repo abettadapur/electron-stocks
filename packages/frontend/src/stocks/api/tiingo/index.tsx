@@ -1,6 +1,6 @@
 import makeApiRequest from "./utils/makeApiRequest";
 import StockQuote from "./models/EODStockQuote";
-import IEXStockQuote from "./models/IEXStockQuote";
+import { iexStockQuoteFromApiModel } from "./models/IEXStockQuote";
 import EODHistorical from "./models/EODHistorical";
 import { TiingoHistoricalPeriod } from "frontend/stocks/redux/stocks/Stocks.types";
 import IEXHistorical from "./models/IEXHistorical";
@@ -13,7 +13,7 @@ export async function getEODStockQuote(ticker: string) {
 
 export async function getIntradayQuote(ticker: string) {
   const result = await makeApiRequest(`iex/${ticker}`);
-  const intradayQuote = IEXStockQuote.fromApiModel(result[0]);
+  const intradayQuote = iexStockQuoteFromApiModel(result[0]);
 
   return intradayQuote;
 }

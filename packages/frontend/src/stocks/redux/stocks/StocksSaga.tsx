@@ -6,8 +6,10 @@ import {
 } from "frontend/stocks/api/tiingo";
 import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
-import IEXStockQuote from "frontend/stocks/api/tiingo/models/IEXStockQuote";
-import { call, put, select, takeLatest } from "redux-saga/effects";
+import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import { SocketEvent, socketEventFromApiModel } from "frontend/stocks/api/tiingo/models/SocketEvent";
+import { eventChannel } from 'redux-saga';
+import { all, call, put, select, takeLatest, fork, take } from "redux-saga/effects";
 import { ActionOf } from "../utils/actionUtils";
 import { Period } from "./Stocks.types";
 import { StocksAction, StocksActions } from "./StocksActions";
@@ -19,9 +21,29 @@ import {
   getWatchlist,
 } from "./StocksSelectors";
 
-export default function* StocksSaga() {
-  yield call(loadWatchlist);
+function createSocketChannel() {
+  return eventChannel(emitter => {
+    const unsubscribe = window.bridge.addEventListener(emitter);
+    return unsubscribe;
+  });
+}
 
+function* listenToSocket(channel) {
+  while (true) {
+    const event = yield take(channel);
+    const socketEvent: SocketEvent = socketEventFromApiModel(JSON.parse(event));
+    if (socketEvent.data && (socketEvent.data.updateMessageType === 'T' || socketEvent.data.updateMessageType === 'Q')) {
+      yield put(StocksActions.updateQuoteWithSocketInfo(new Date(socketEvent.data.date), socketEvent.data.ticker, socketEvent.data.lastPrice))
+    }
+  }
+}
+
+export default function* StocksSaga() {
+  let watchlist = yield call(loadWatchlist);
+  yield call(window.bridge.createSocket, watchlist);
+  const socketChannel = yield call(createSocketChannel);
+  yield fork(listenToSocket, socketChannel);
+  yield call(loadQuotes, watchlist);
   yield takeLatest(StocksActions.addTickerToWatchlist.type, saveWatchlist);
   yield takeLatest(StocksActions.setSelectedStock.type, onStockChanged);
   yield takeLatest(StocksActions.setSelectedPeriod.type, onPeriodChanged);
@@ -37,7 +59,6 @@ function* loadWatchlist() {
     try {
       const watchlist = JSON.parse(savedWatchlistJSON);
       yield put(StocksActions.setWatchlist(watchlist));
-
       return watchlist;
     } catch (e) {
       yield call([localStorage, localStorage.removeItem], "watchlist");
@@ -47,7 +68,7 @@ function* loadWatchlist() {
   return [];
 }
 
-function* saveWatchlist() {
+function* saveWatchlist(action: ActionOf<StocksAction, typeof StocksActions.addTickerToWatchlist.type>) {
   const currentWatchlist: string[] = yield select(getWatchlist);
   const currentWatchlistJSON = JSON.stringify(currentWatchlist);
   yield call(
@@ -55,6 +76,12 @@ function* saveWatchlist() {
     "watchlist",
     currentWatchlistJSON
   );
+
+  yield call(loadIntradayQuote, action.payload.ticker);
+
+  if (action && action.payload.ticker) {
+    yield call(window.bridge.addTicker, action.payload.ticker);
+  }
 }
 
 function* onStockChanged(
@@ -132,4 +159,8 @@ function* loadHistoricalData(ticker: string, period: Period) {
 function* loadIntradayQuote(ticker: string) {
   const quote: IEXStockQuote = yield call(getIntradayQuote, ticker);
   yield put(StocksActions.quoteLoaded(ticker, quote));
+}
+
+function* loadQuotes(tickers: string[]) {
+  yield all(tickers.map(ticker => call(loadIntradayQuote, ticker)));
 }
