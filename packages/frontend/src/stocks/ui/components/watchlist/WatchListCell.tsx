@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import View from '../../view/View';
 import Text from "frontend/stocks/ui/components/text/Text";
 import { useTheme } from '../../theme/Theme';
+import Icon from '../icon/Icon';
+import { MdCancel } from 'react-icons/md';
 
 type CellProps = {
   ticker: string;
@@ -85,6 +87,10 @@ export default function WatchlistCell(props: CellProps) {
         </Text>}
       </ColumnSmall>
       {isHovered && <DeleteButton onClick={(e) => { onRemoveClicked(e, ticker) }}>
+        <Icon
+          size="small"
+          icon={MdCancel}
+        />
         <i className="fas fa-times-circle" style={{ color: theme.semanticColors.textPrimary }} />
       </DeleteButton>}
     </CellContainer>

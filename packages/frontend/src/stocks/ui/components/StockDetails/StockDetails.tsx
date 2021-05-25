@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { connect } from "react-redux";
 import {
   StocksAwareState,
   Period,
 } from "frontend/stocks/redux/stocks/Stocks.types";
 import View from "../../view/View";
-import { IoMdArrowDropup } from "react-icons/io";
+import { MdArrowDropUp } from "react-icons/md";
 import HistoricalGraph from "../HistoricalGraph/HistoricalGraph";
 import HistoricalPeriodButtons from "../HistoricalPeriodButtons/HistoricalPeriodButtons";
 import { getQuote } from "frontend/stocks/redux/stocks/StocksSelectors";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import Text from "../text/Text";
+import Icon from "../icon/Icon";
 
 type Props = {
   selected: string;
@@ -46,9 +47,10 @@ function StockDetails(props: Props) {
             100
           ).toFixed(2)}
           %)
-          <IoMdArrowDropup
+          <Icon
+            size="medium"
+            icon={MdArrowDropUp}
             style={{
-              fontSize: 25,
               color: lastQuote.price > lastQuote.prevClose ? "green" : "red",
             }}
           />
