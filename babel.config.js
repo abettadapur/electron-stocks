@@ -10,20 +10,20 @@ module.exports = function babelConfig(api) {
     babelrc: true,
     babelrcRoots: [
       // Keep the root as a root
-      '.',
+      ".",
       // Also consider monorepo packages "root" and load their .babelrc files.
-      './packages/*',
-      './assets/*',
+      "./packages/*",
+      "./assets/*",
     ],
-    presets: ['@babel/typescript'],
+    presets: ["@babel/typescript"],
     plugins: [
-      '@babel/plugin-transform-modules-commonjs',
-      ['@babel/plugin-proposal-decorators', {legacy: true}],
-      ['@babel/plugin-proposal-class-properties', {loose: true}],
-      '@babel/plugin-proposal-optional-chaining',
-      '@babel/plugin-proposal-nullish-coalescing-operator',
-      'babel-plugin-fbt',
-      'babel-plugin-fbt-runtime',
+      "@babel/plugin-transform-modules-commonjs",
+      ["@babel/plugin-proposal-decorators", { legacy: true }],
+      ["@babel/plugin-proposal-class-properties", { loose: true }],
+      "@babel/plugin-proposal-optional-chaining",
+      "@babel/plugin-proposal-nullish-coalescing-operator",
+      "babel-plugin-fbt",
+      "babel-plugin-fbt-runtime",
     ],
   };
 };

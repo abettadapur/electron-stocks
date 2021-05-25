@@ -7,12 +7,14 @@ export default function createTasksStore() {
     {
       initialState: {},
       //@ts-ignore
-      extensions: [getSagaExtension(undefined, (e, i) => {
-        setTimeout(() => {
-          (e as any).info = i && i.sagaStack;
-          throw e;
-        }, 0);
-      })],
+      extensions: [
+        getSagaExtension(undefined, (e, i) => {
+          setTimeout(() => {
+            (e as any).info = i && i.sagaStack;
+            throw e;
+          }, 0);
+        }),
+      ],
     },
     // @ts-ignore These types are all fucked, whatever
     StocksModule

@@ -1,15 +1,14 @@
-
 export function socketEventFromApiModel(model: object): SocketEvent {
   if (model) {
     let socketEvent: SocketEvent = {
       messageType: model["messageType"],
       service: model["service"],
-      data: socketEventDataFromApiModel(model["data"])
-    }
-    return socketEvent
+      data: socketEventDataFromApiModel(model["data"]),
+    };
+    return socketEvent;
   }
   return null;
-};
+}
 
 export type SocketEvent = {
   messageType: string;
@@ -35,28 +34,28 @@ function socketEventDataFromApiModel(model: object): SocketEventData {
       afterHours: model[12],
       intermarketSweepOrder: model[13],
       oddlot: model[14],
-      nmsRule: model[15]
-    }
+      nmsRule: model[15],
+    };
     return socketEventData;
   }
   return null;
-};
+}
 
 export type SocketEventData = {
-  updateMessageType: string,
-  date: Date,
-  nanoseconds: number,
-  ticker: string,
-  bidSize: number,
-  bidPrice: number,
-  midPrice: number,
-  askPrice: number,
-  askSize: number,
-  lastPrice: number,
-  lastSize: number,
-  halted: number,
-  afterHours: number,
-  intermarketSweepOrder: number,
-  oddlot: number,
-  nmsRule: number
+  updateMessageType: string;
+  date: Date;
+  nanoseconds: number;
+  ticker: string;
+  bidSize: number;
+  bidPrice: number;
+  midPrice: number;
+  askPrice: number;
+  askSize: number;
+  lastPrice: number;
+  lastSize: number;
+  halted: number;
+  afterHours: number;
+  intermarketSweepOrder: number;
+  oddlot: number;
+  nmsRule: number;
 };

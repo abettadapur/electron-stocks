@@ -6,7 +6,7 @@ import { StocksActions } from "frontend/stocks/redux/stocks/StocksActions";
 type Props = typeof Actions;
 
 const SearchContainer = styled.div({
-  textAlign: "end"
+  textAlign: "end",
 });
 
 function SearchBar(props: Props) {
@@ -15,14 +15,17 @@ function SearchBar(props: Props) {
   const [searchValue, setSearchValue] = useState("");
   return (
     <SearchContainer>
-      <input placeholder="Search.." onChange={(e) => setSearchValue(e.currentTarget.value)} />
+      <input
+        placeholder="Search.."
+        onChange={(e) => setSearchValue(e.currentTarget.value)}
+      />
       <button onClick={() => setSelectedStock(searchValue)}>Search</button>
     </SearchContainer>
   );
 }
 
 const Actions = {
-  setSelectedStock: StocksActions.setSelectedStock
+  setSelectedStock: StocksActions.setSelectedStock,
 };
 
 export default connect(null, Actions)(SearchBar);

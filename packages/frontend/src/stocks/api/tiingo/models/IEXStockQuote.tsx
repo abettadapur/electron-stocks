@@ -7,7 +7,7 @@ export type IEXStockQuote = {
   volume: number;
   timestamp: Date;
   prevClose: number;
-}
+};
 
 export function iexStockQuoteFromApiModel(model: object): IEXStockQuote {
   if (model) {
@@ -19,7 +19,7 @@ export function iexStockQuoteFromApiModel(model: object): IEXStockQuote {
       price: model["last"],
       prevClose: model["prevClose"],
       volume: model["volume"],
-      timestamp: new Date(Date.parse(model["timestamp"]))
+      timestamp: new Date(Date.parse(model["timestamp"])),
     };
     return quote;
   }

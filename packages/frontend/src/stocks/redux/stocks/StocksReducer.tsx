@@ -10,7 +10,7 @@ const StocksReducer = makeReducer(
     selectedPeriod: "1d" as Period,
     historicalData: {},
     quotes: {},
-    tickerInvalid: false
+    tickerInvalid: false,
   },
   (state: StocksState, action: StocksAction) => {
     switch (action.type) {
@@ -74,13 +74,15 @@ const StocksReducer = makeReducer(
       }
 
       case StocksActions.updateQuoteWithSocketInfo.type: {
-        if (action.payload.lastPrice != null && action.payload.lastPrice !== 0) {
+        if (
+          action.payload.lastPrice != null &&
+          action.payload.lastPrice !== 0
+        ) {
           if (!state.quotes[action.payload.ticker]) {
             state.quotes[action.payload.ticker] = {};
           }
           state.quotes[action.payload.ticker].price = action.payload.lastPrice;
         }
-
       }
     }
   }

@@ -14,36 +14,35 @@ export type Theme = {
     surface: string;
     surfaceSelected: string;
     textPrimary: string;
-  }
+  };
 };
 
 const defaultTheme: Theme = {
   colors: {
     white: "#FFFFFF",
     black: "#000000",
-    gray: 'rgba(0, 0, 0, 0.3)'
+    gray: "rgba(0, 0, 0, 0.3)",
   },
   semanticColors: {
     background: "#FFFFFF",
     surface: "#EAEAEA",
     surfaceSelected: "#C1E1EC",
-    textPrimary: "#000000"
-  }
+    textPrimary: "#000000",
+  },
 };
-
 
 const darkTheme: Theme = {
   colors: {
     white: "#FFFFFF",
     black: "#000000",
-    gray: 'rgba(0, 0, 0, 0.3)'
+    gray: "rgba(0, 0, 0, 0.3)",
   },
   semanticColors: {
     background: "#000000",
     surface: "#4A4A4A",
     surfaceSelected: "#276B80",
-    textPrimary: "#FFFFFF"
-  }
+    textPrimary: "#FFFFFF",
+  },
 };
 
 export function ThemeContextProvider(props: React.PropsWithChildren<{}>) {

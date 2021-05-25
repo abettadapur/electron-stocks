@@ -4,26 +4,26 @@
  * @format
  */
 
-const {getEntryPoints} = require('../../../scripts/htmlGenerator');
-const path = require('path');
+const { getEntryPoints } = require("../../../scripts/htmlGenerator");
+const path = require("path");
 
 function getEntryConfig(includeDevScripts) {
   const entryPoints = getEntryPoints();
   const entryConfig = {};
   if (includeDevScripts) {
-    entryPoints.forEach(entry => {
+    entryPoints.forEach((entry) => {
       entryConfig[entry] = [
-        'webpack-dev-server/client?http://localhost:9000',
-        'webpack/hot/only-dev-server',
-        './packages/frontend/src/beforeEntry.tsx',
+        "webpack-dev-server/client?http://localhost:9000",
+        "webpack/hot/only-dev-server",
+        "./packages/frontend/src/beforeEntry.tsx",
         `./packages/frontend/src/entry/${entry}.tsx`,
       ];
     });
   } else {
-    entryPoints.forEach(entry => {
+    entryPoints.forEach((entry) => {
       entryConfig[entry] = [
-        path.join(__dirname, '..', 'src/beforeEntry.tsx'),
-        path.join(__dirname, '..', `src/entry/${entry}.tsx`),
+        path.join(__dirname, "..", "src/beforeEntry.tsx"),
+        path.join(__dirname, "..", `src/entry/${entry}.tsx`),
       ];
     });
   }

@@ -3,7 +3,7 @@ import styled from "../../../../styled";
 import View from "../../view/View";
 import Watchlist from "../watchlist/Watchlist";
 import StockDetails from "../StockDetails/StockDetails";
-import SearchBar from '../SearchBar/SearchBar';
+import SearchBar from "../SearchBar/SearchBar";
 
 const StocksViewContainer = styled(View)({
   flexDirection: "row",

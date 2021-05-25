@@ -19,21 +19,21 @@ type Props = {
   tickerInvalid: boolean;
 };
 
-const PriceQuote = styled(Text)<{ gain: boolean }>(props => ({
+const PriceQuote = styled(Text)<{ gain: boolean }>((props) => ({
   color: props.gain ? "green" : "red",
-  marginLeft: 12
+  marginLeft: 12,
 }));
 
-const PctQuote = styled(Text)<{ gain: boolean }>(props => ({
+const PctQuote = styled(Text)<{ gain: boolean }>((props) => ({
   color: props.gain ? "green" : "red",
-  marginLeft: 12
+  marginLeft: 12,
 }));
 
 function StockDetails(props: Props) {
   let { selected, lastQuote, tickerInvalid } = props;
 
   if (tickerInvalid) {
-    return <div>Ticker Invalid</div>
+    return <div>Ticker Invalid</div>;
   }
 
   if (!lastQuote || !selected) {
@@ -41,17 +41,19 @@ function StockDetails(props: Props) {
   }
 
   const gain = lastQuote.price - lastQuote.prevClose > 0;
-  const plusOrMinus = gain ? '+' : '-';
+  const plusOrMinus = gain ? "+" : "-";
 
   return (
     <View>
       <Text>{props.selected.toUpperCase()}</Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Text>${lastQuote.price}</Text>
         <PriceQuote gain={gain}>
-          {plusOrMinus}{Math.abs((lastQuote.price - lastQuote.prevClose)).toFixed(2)}
+          {plusOrMinus}
+          {Math.abs(lastQuote.price - lastQuote.prevClose).toFixed(2)}
         </PriceQuote>
-        <PctQuote gain={gain}>(
+        <PctQuote gain={gain}>
+          (
           {(
             ((lastQuote.price - lastQuote.prevClose) / lastQuote.prevClose) *
             100
@@ -73,7 +75,7 @@ const mapStateToProps = (state: StocksAwareState): Props => ({
   selected: state.stocks.selected,
   selectedPeriod: state.stocks.selectedPeriod,
   lastQuote: getQuote(state, state.stocks.selected),
-  tickerInvalid: state.stocks.tickerInvalid
+  tickerInvalid: state.stocks.tickerInvalid,
 });
 
 export default connect(mapStateToProps)(StockDetails);

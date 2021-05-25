@@ -1,6 +1,6 @@
-const fs=require("fs");
-const path=require("path");
-const ejs=require("ejs");
+const fs = require("fs");
+const path = require("path");
+const ejs = require("ejs");
 
 const entryDirectory = path.join(
   __dirname,
@@ -70,5 +70,5 @@ function getJsFiles(directory, extension) {
 
 module.exports = {
   getEntryPoints,
-  generateDevelopmentHtml
-}
+  generateDevelopmentHtml,
+};

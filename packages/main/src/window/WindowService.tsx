@@ -10,7 +10,14 @@ export class __WindowService {
       resizable: true, // Have this on by default, so Windows OS snaps correctly (https://github.com/electron/electron/issues/11568)
       webPreferences: {
         nativeWindowOpen: true,
-        preload: path.resolve(__dirname, '..', '..', '..', 'bridge', 'preload.dev.js'),
+        preload: path.resolve(
+          __dirname,
+          "..",
+          "..",
+          "..",
+          "bridge",
+          "preload.dev.js"
+        ),
         //   !makeSecure || !isPortalWindow ? this._getPreloadFile() : undefined,
         // We can't set the __bridge on window from preload unless this option is on
         contextIsolation: false,

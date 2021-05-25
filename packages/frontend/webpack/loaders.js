@@ -4,13 +4,12 @@
  * @format
  */
 
-const path = require('path');
+const path = require("path");
 
 const moduleLoaders = () => {
-
-  const cacheIdentifier = 'tasks';
+  const cacheIdentifier = "tasks";
   return {
-    resolve: {extensions: ['.js', '.ts', '.tsx', '.json']},
+    resolve: { extensions: [".js", ".ts", ".tsx", ".json"] },
     module: {
       rules: [
         {
@@ -18,15 +17,15 @@ const moduleLoaders = () => {
           exclude: /node_modules/,
           use: [
             {
-              loader: 'cache-loader',
+              loader: "cache-loader",
               options: {
                 cacheIdentifier,
               },
             },
             {
-              loader: 'babel-loader',
+              loader: "babel-loader",
               options: {
-                rootMode: 'upward',
+                rootMode: "upward",
               },
             },
           ],
@@ -64,10 +63,10 @@ const moduleLoaders = () => {
           test: /\.((static\.svg)|png|woff2|ttf)$/,
           use: [
             {
-              loader: 'file-loader',
+              loader: "file-loader",
               options: {
-                outputPath: 'assets',
-                name: '[path][name].[ext]',
+                outputPath: "assets",
+                name: "[path][name].[ext]",
               },
             },
           ],
@@ -76,10 +75,10 @@ const moduleLoaders = () => {
           test: /\.css$/,
           use: [
             {
-              loader: 'style-loader',
+              loader: "style-loader",
             },
             {
-              loader: 'css-loader',
+              loader: "css-loader",
             },
           ],
         },

@@ -62,8 +62,12 @@ export const StocksActions = {
   ),
   updateQuoteWithSocketInfo: actionCreator(
     "stocks/updateQuoteWithSocketInfo" as const,
-    (date: Date, ticker: string, lastPrice: number) => ({ date, ticker, lastPrice })
-  )
+    (date: Date, ticker: string, lastPrice: number) => ({
+      date,
+      ticker,
+      lastPrice,
+    })
+  ),
 };
 
 export type StocksAction = ActionsUnion<typeof StocksActions>;

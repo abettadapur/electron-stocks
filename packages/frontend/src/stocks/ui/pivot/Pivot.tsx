@@ -29,10 +29,8 @@ const SelectedPivotItem = styled(View)({
 
 export default function Pivot(props: Props) {
   const pivotItemRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-  const [
-    selectedBarStyles,
-    setSelectedBarStyles,
-  ] = useState<React.CSSProperties | null>(null);
+  const [selectedBarStyles, setSelectedBarStyles] =
+    useState<React.CSSProperties | null>(null);
   const { pivotItems, onItemSelected, selectedKey } = props;
   const onPivotItemClicked = useCallback(
     (itemKey: string) => {

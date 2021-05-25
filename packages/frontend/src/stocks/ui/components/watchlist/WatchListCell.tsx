@@ -1,45 +1,50 @@
-import { IEXStockQuote } from 'frontend/stocks/api/tiingo/models/IEXStockQuote';
-import styled from 'frontend/styled';
-import React, { useEffect, useRef, useState } from 'react';
-import View from '../../view/View';
+import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import styled from "frontend/styled";
+import React, { useEffect, useRef, useState } from "react";
+import View from "../../view/View";
 import Text from "frontend/stocks/ui/components/text/Text";
-import { useTheme } from '../../theme/Theme';
-import Icon from '../icon/Icon';
-import { MdCancel } from 'react-icons/md';
+import { useTheme } from "../../theme/Theme";
+import Icon from "../icon/Icon";
+import { MdCancel } from "react-icons/md";
 
 type CellProps = {
   ticker: string;
   selected: boolean;
-  onRemoveClicked: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, w: string) => void;
+  onRemoveClicked: (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    w: string
+  ) => void;
   quote: IEXStockQuote;
-}
+};
 
-const CellContainer = styled(View)<{ selected: boolean }>(props => ({
-  flexDirection: 'row',
+const CellContainer = styled(View)<{ selected: boolean }>((props) => ({
+  flexDirection: "row",
   height: 60,
   fontSize: 20,
-  backgroundColor: props.selected ? props.theme.semanticColors.surfaceSelected : props.theme.semanticColors.surface,
+  backgroundColor: props.selected
+    ? props.theme.semanticColors.surfaceSelected
+    : props.theme.semanticColors.surface,
   borderRadius: 8,
   padding: 8,
-  alignItems: 'center'
+  alignItems: "center",
 }));
 
 const ColumnLarge = styled(View)({
   flex: 2,
-  maxWidth: '40%'
+  maxWidth: "40%",
 });
 
 const ColumnSmall = styled(View)({
-  flex: 1
+  flex: 1,
 });
 
 const DeleteButton = styled.button({
   height: 20,
-  position: 'absolute',
+  position: "absolute",
   right: -2,
   top: 2,
-  background: 'Transparent',
-  border: 'none'
+  background: "Transparent",
+  border: "none",
 });
 
 export default function WatchlistCell(props: CellProps) {
@@ -63,36 +68,45 @@ export default function WatchlistCell(props: CellProps) {
         colorTimeout.current = setTimeout(() => {
           setPrevPrice(price);
         }, 1500);
-      }
-      else {
+      } else {
         setPrevPrice(price);
       }
     }
-  }, [price])
+  }, [price]);
 
   if (price && prevPrice && prevPrice != price) {
-    color = price > prevPrice ? 'green' : 'red';
+    color = price > prevPrice ? "green" : "red";
   }
 
   return (
-    <CellContainer selected={selected} onMouseOver={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+    <CellContainer
+      selected={selected}
+      onMouseOver={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <ColumnLarge>
-        <Text>
-          {ticker.toUpperCase()}
-        </Text>
+        <Text>{ticker.toUpperCase()}</Text>
       </ColumnLarge>
       <ColumnSmall>
-        {price && <Text style={{ textAlign: 'end' as 'end', color: color }}>
-          {price.toFixed(2)}
-        </Text>}
+        {price && (
+          <Text style={{ textAlign: "end" as "end", color: color }}>
+            {price.toFixed(2)}
+          </Text>
+        )}
       </ColumnSmall>
-      {isHovered && <DeleteButton onClick={(e) => { onRemoveClicked(e, ticker) }}>
-        <Icon
-          size="small"
-          icon={MdCancel}
-        />
-        <i className="fas fa-times-circle" style={{ color: theme.semanticColors.textPrimary }} />
-      </DeleteButton>}
+      {isHovered && (
+        <DeleteButton
+          onClick={(e) => {
+            onRemoveClicked(e, ticker);
+          }}
+        >
+          <Icon size="small" icon={MdCancel} />
+          <i
+            className="fas fa-times-circle"
+            style={{ color: theme.semanticColors.textPrimary }}
+          />
+        </DeleteButton>
+      )}
     </CellContainer>
   );
 }

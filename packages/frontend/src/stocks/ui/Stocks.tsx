@@ -6,9 +6,9 @@ import StocksView from "./components/stocksView/StocksView";
 import View from "./view/View";
 import styled from "frontend/styled";
 
-const StocksContainer = styled(View)(props => ({
+const StocksContainer = styled(View)((props) => ({
   backgroundColor: props.theme.semanticColors.background,
-  flex: 1
+  flex: 1,
 }));
 
 function Stocks(props: { menuItem: string }) {

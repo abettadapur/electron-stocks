@@ -10,9 +10,7 @@ export default function UIRoot(props: React.PropsWithChildren<{}>) {
     <StrictMode>
       <CacheProvider value={emotionCache}>
         <Global styles={globalStyles} />
-        <ThemeContextProvider>
-          {props.children}
-        </ThemeContextProvider>
+        <ThemeContextProvider>{props.children}</ThemeContextProvider>
       </CacheProvider>
     </StrictMode>
   );

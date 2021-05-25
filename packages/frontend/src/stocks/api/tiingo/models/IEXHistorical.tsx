@@ -1,5 +1,4 @@
 export default class IEXHistorical {
-
   public get date() {
     return this._date;
   }
@@ -22,7 +21,7 @@ export default class IEXHistorical {
     private _high: number,
     private _low: number,
     private _open: number
-  ) { }
+  ) {}
 
   public static fromApiModel(model: object): IEXHistorical {
     return new IEXHistorical(

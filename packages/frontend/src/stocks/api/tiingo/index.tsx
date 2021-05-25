@@ -19,28 +19,38 @@ export async function getIntradayQuote(ticker: string) {
 }
 
 export async function getQuotesForWatchlist(watchlist: string[]) {
-  return Promise.all(watchlist.map(ticker => getIntradayQuote(ticker)));
+  return Promise.all(watchlist.map((ticker) => getIntradayQuote(ticker)));
 }
 
-export async function getEODHistoricalData(ticker: string, startDate: string, endDate: string, resampleFreq: TiingoHistoricalPeriod) {
+export async function getEODHistoricalData(
+  ticker: string,
+  startDate: string,
+  endDate: string,
+  resampleFreq: TiingoHistoricalPeriod
+) {
   const result = await makeApiRequest(`tiingo/daily/${ticker}/prices`, {
-    format: 'json',
+    format: "json",
     startDate,
     endDate,
-    resampleFreq
+    resampleFreq,
   });
   const historicalData = EODHistorical.fromApiModelList(result);
   return historicalData;
 }
 
-export async function getIEXHistoricalData(ticker: string, startDate: string, endDate: string, period: string) {
+export async function getIEXHistoricalData(
+  ticker: string,
+  startDate: string,
+  endDate: string,
+  period: string
+) {
   let nums = period.match(/\d/);
   const periodLength = nums ? nums[0] : 1;
 
   const result = await makeApiRequest(`iex/${ticker}/prices`, {
     startDate,
     endDate,
-    resampleFreq: `${periodLength}min`
+    resampleFreq: `${periodLength}min`,
   });
   const historicalData = IEXHistorical.fromApiModelList(result);
   return historicalData;

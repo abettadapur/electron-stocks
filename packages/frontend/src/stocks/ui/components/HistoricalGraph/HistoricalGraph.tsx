@@ -1,12 +1,18 @@
 import React, { useEffect, MutableRefObject, useState } from "react";
 import View from "../../view/View";
 import styled from "../../../../styled";
-import { StocksAwareState, Period } from "frontend/stocks/redux/stocks/Stocks.types";
-import { getSelectedHistoricalData, getQuote } from "frontend/stocks/redux/stocks/StocksSelectors";
+import {
+  StocksAwareState,
+  Period,
+} from "frontend/stocks/redux/stocks/Stocks.types";
+import {
+  getSelectedHistoricalData,
+  getQuote,
+} from "frontend/stocks/redux/stocks/StocksSelectors";
 import { connect } from "react-redux";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
 import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
-import { HISTORICAL_PERIOD_INFO } from 'frontend/stocks/redux/stocks/StocksConstants';
+import { HISTORICAL_PERIOD_INFO } from "frontend/stocks/redux/stocks/StocksConstants";
 import { createProxyProxy } from "immer/dist/internal";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 
@@ -42,8 +48,7 @@ function HistoricalGraph(props: Props) {
         onMouseMove={(e) => {
           setMousePoint({ x: e.clientX, y: e.clientY });
         }}
-        onMouseDown={(e) => {
-        }}
+        onMouseDown={(e) => {}}
         ref={canvasRef}
         style={{ border: "1px solid black" }}
       ></GraphCanvas>
@@ -69,14 +74,14 @@ function drawGraph(
   canvasRef: React.MutableRefObject<HTMLCanvasElement>
 ) {
   const { min, max } = getMinMaxOverPeriod(data);
-  const periodInfo = HISTORICAL_PERIOD_INFO[selectedPeriod || '1d'];
+  const periodInfo = HISTORICAL_PERIOD_INFO[selectedPeriod || "1d"];
   const yDividerCount = periodInfo.yDividerCount;
   let yDividers = [min];
   let dividerHeight = (max - min) / (yDividerCount - 1);
   const isUp = data[data.length - 1].close > lastQuote.prevClose;
 
   for (var i = 0; i < yDividerCount - 2; i++) {
-    yDividers.push(min + (dividerHeight * (i + 1)));
+    yDividers.push(min + dividerHeight * (i + 1));
   }
   yDividers.push(max);
 
@@ -189,9 +194,10 @@ function drawGraph(
   });
 }
 
-function getMinMaxOverPeriod(
-  data: EODHistorical[] | IEXHistorical[]
-): { max: number; min: number } {
+function getMinMaxOverPeriod(data: EODHistorical[] | IEXHistorical[]): {
+  max: number;
+  min: number;
+} {
   let max = data[0].close;
   let min = data[0].close;
   data.forEach((point) => {
