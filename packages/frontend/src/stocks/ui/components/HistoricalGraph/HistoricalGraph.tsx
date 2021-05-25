@@ -15,6 +15,7 @@ import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import { HISTORICAL_PERIOD_INFO } from "frontend/stocks/redux/stocks/StocksConstants";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import { Theme, useTheme } from "../../theme/Theme";
+import throttle from "lodash.throttle";
 
 type Props = {
   historicalData: IEXHistorical[] | EODHistorical[] | undefined;
@@ -25,36 +26,71 @@ type Props = {
 type Point = { x: number; y: number };
 
 const GraphCanvas = styled.canvas({
-  height: 200,
+  height: "100%",
   width: "100%",
 });
 
 function HistoricalGraph(props: Props) {
   let { historicalData, period, lastQuote } = props;
-  const [mousePoint, setMousePoint] = useState<Point | null>(null);
-
+  const [canvasDimensions, setCanvasDimensions] =
+    useState<{ height: number; width: number } | null>(null);
   const canvasRef = React.useRef() as MutableRefObject<HTMLCanvasElement>;
+  const mousePointRef = React.useRef<Point | null>(null);
   const theme = useTheme();
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      setCanvasDimensions({ height: rect.height, width: rect.width });
+    }
+  }, []);
+
+  useEffect(() => {
+    const listener = throttle(() => {
+      if (canvasRef.current) {
+        const rect = canvasRef.current.getBoundingClientRect();
+        setCanvasDimensions({ height: rect.height, width: rect.width });
+      }
+    }, 1000);
+    window.addEventListener("resize", listener);
+
+    return () => {
+      window.removeEventListener("resize", listener);
+    };
+  });
+
   useEffect(() => {
     if (historicalData && historicalData.length > 0) {
       drawGraph(
         historicalData,
         period,
         lastQuote,
-        mousePoint,
+        mousePointRef.current,
         canvasRef,
         theme
       );
     }
-  }, [historicalData, mousePoint]);
+  }, [historicalData, canvasDimensions]);
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <GraphCanvas
-        height={900}
-        width={1600}
+        height={canvasDimensions?.height || 0}
+        width={canvasDimensions?.width || 0}
         onMouseMove={(e) => {
-          setMousePoint({ x: e.clientX, y: e.clientY });
+          mousePointRef.current = { x: e.clientX, y: e.clientY };
+          requestAnimationFrame(() => {
+            if (historicalData && historicalData.length > 0) {
+              drawGraph(
+                historicalData,
+                period,
+                lastQuote,
+                mousePointRef.current,
+                canvasRef,
+                theme
+              );
+            }
+          });
         }}
         onMouseDown={(e) => {}}
         ref={canvasRef}
@@ -107,11 +143,6 @@ function drawGraph(
     return Math.round(index * pixelsPerIndex);
   }
 
-  function xToIndex(x: number) {
-    const pixelsPerIndex = canvasRef.current.width / (data.length - 1);
-    return Math.min(data.length - 1, Math.round(x / pixelsPerIndex));
-  }
-
   function mousePointToCanvasPoint(point: Point): Point {
     const boundingRect = canvasRef.current.getBoundingClientRect();
 
@@ -132,8 +163,8 @@ function drawGraph(
   ctx.beginPath();
   ctx?.setLineDash([]);
   data.forEach((point, index) => {
-    ctx.lineWidth = "8";
-    ctx.strokeStyle = isUp
+    ctx!.lineWidth = 4;
+    ctx!.strokeStyle = isUp
       ? theme.semanticColors.gain
       : theme.semanticColors.loss;
     const x = indexToX(index);
@@ -150,8 +181,8 @@ function drawGraph(
 
   ctx.beginPath();
   data.forEach((point, index) => {
-    ctx.lineWidth = "2";
-    ctx.strokeStyle = theme.colors.red_600;
+    ctx!.lineWidth = 4;
+    ctx!.strokeStyle = theme.colors.red_600;
     const x = indexToX(index);
     const y = priceToY(point.close);
     if (!index) {
@@ -172,19 +203,16 @@ function drawGraph(
 
   ctx.fillStyle = grd;
 
-  ctx?.fill();
-  ctx?.closePath();
+  ctx!.fill();
+  ctx!.closePath();
 
   // Draw the point
   if (mousePoint) {
     const canvasPoint = mousePointToCanvasPoint(mousePoint);
-    const index = xToIndex(canvasPoint.x);
-    const dataPoint = data[index];
-
     ctx.beginPath();
     ctx.setLineDash([5]);
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = theme.semanticColors.textPrimary;
+    ctx.lineWidth = 1;
     ctx.moveTo(canvasPoint.x, 0);
     ctx.lineTo(canvasPoint.x, canvasRef.current.height);
     ctx.stroke();
@@ -194,9 +222,10 @@ function drawGraph(
   // Draw y dividers
   yDividers.forEach((divider, i) => {
     if (!(i === 0 || i === yDividers.length - 1)) {
-      ctx?.beginPath();
-      ctx.lineWidth = "3";
-      ctx.strokeStyle = "#dddddd";
+      ctx!.setLineDash([5]);
+      ctx!.beginPath();
+      ctx!.lineWidth = 1;
+      ctx!.strokeStyle = "#dddddd";
       ctx?.moveTo(0, priceToY(divider));
       ctx?.lineTo(canvasRef.current.width, priceToY(divider));
       ctx?.stroke();

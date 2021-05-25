@@ -48,7 +48,7 @@ function StockDetails(props: Props) {
   const plusOrMinus = gain ? "+" : "-";
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <Text textSize="medium">{props.selected.toUpperCase()}</Text>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Text textSize="medium">{lastQuote.price}</Text>
@@ -65,7 +65,7 @@ function StockDetails(props: Props) {
           %)
         </PctQuote>
       </View>
-      <View>
+      <View style={{ flex: 1, maxHeight: 500 }}>
         <HistoricalGraph />
         <HistoricalPeriodButtons
           periods={["1d", "5d", "1m", "6m", "ytd", "1y", "5y"]}
