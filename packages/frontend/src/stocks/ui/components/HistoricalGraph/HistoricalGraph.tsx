@@ -143,6 +143,11 @@ function drawGraph(
     return Math.round(index * pixelsPerIndex);
   }
 
+  function xToIndex(x: number) {
+    const pixelsPerIndex = canvasRef.current.width / (data.length - 1);
+    return Math.min(data.length - 1, Math.round(x / pixelsPerIndex));
+  }
+
   function mousePointToCanvasPoint(point: Point): Point {
     const boundingRect = canvasRef.current.getBoundingClientRect();
 
@@ -206,7 +211,7 @@ function drawGraph(
   ctx!.fill();
   ctx!.closePath();
 
-  // Draw the point
+  // Draw the mouse line
   if (mousePoint) {
     const canvasPoint = mousePointToCanvasPoint(mousePoint);
     ctx.beginPath();
@@ -217,6 +222,28 @@ function drawGraph(
     ctx.lineTo(canvasPoint.x, canvasRef.current.height);
     ctx.stroke();
     ctx.closePath();
+
+    // Draw the price point on the graph
+    const index = xToIndex(canvasPoint.x);
+    const point = data[index];
+    const y = priceToY(point.close);
+
+    ctx.fillStyle = isUp
+      ? theme.semanticColors.gain
+      : theme.semanticColors.loss;
+    ctx.strokeStyle = isUp
+      ? theme.semanticColors.gain
+      : theme.semanticColors.loss;
+    ctx.beginPath();
+    ctx.arc(canvasPoint.x, y, 6, 0, 2 * Math.PI);
+    ctx.closePath();
+    ctx.fill();
+
+    // Draw the price text
+
+    ctx.fillStyle = theme.semanticColors.textPrimary;
+    ctx.font = "18px Segoe UI";
+    ctx.fillText(point.close.toFixed(2).toString(), canvasPoint.x + 4, 40);
   }
 
   // Draw y dividers
