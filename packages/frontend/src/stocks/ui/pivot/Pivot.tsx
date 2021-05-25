@@ -18,14 +18,14 @@ const PivotItemContainer = styled(View)({
   flexDirection: "row",
 });
 
-const SelectedPivotItem = styled(View)({
+const SelectedPivotItem = styled(View)((props) => ({
   position: "absolute",
   bottom: 3,
   left: 0,
   height: 2,
-  backgroundColor: "blue",
+  backgroundColor: props.theme.semanticColors.primary,
   transition: "transform linear 100ms",
-});
+}));
 
 export default function Pivot(props: Props) {
   const pivotItemRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});

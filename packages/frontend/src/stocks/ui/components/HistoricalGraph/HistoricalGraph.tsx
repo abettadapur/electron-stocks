@@ -13,8 +13,8 @@ import { connect } from "react-redux";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
 import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import { HISTORICAL_PERIOD_INFO } from "frontend/stocks/redux/stocks/StocksConstants";
-import { createProxyProxy } from "immer/dist/internal";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import { Theme, useTheme } from "../../theme/Theme";
 
 type Props = {
   historicalData: IEXHistorical[] | EODHistorical[] | undefined;
@@ -34,9 +34,17 @@ function HistoricalGraph(props: Props) {
   const [mousePoint, setMousePoint] = useState<Point | null>(null);
 
   const canvasRef = React.useRef() as MutableRefObject<HTMLCanvasElement>;
+  const theme = useTheme();
   useEffect(() => {
     if (historicalData && historicalData.length > 0) {
-      drawGraph(historicalData, period, lastQuote, mousePoint, canvasRef);
+      drawGraph(
+        historicalData,
+        period,
+        lastQuote,
+        mousePoint,
+        canvasRef,
+        theme
+      );
     }
   }, [historicalData, mousePoint]);
 
@@ -71,7 +79,8 @@ function drawGraph(
   selectedPeriod: Period,
   lastQuote: IEXStockQuote,
   mousePoint: Point | null,
-  canvasRef: React.MutableRefObject<HTMLCanvasElement>
+  canvasRef: React.MutableRefObject<HTMLCanvasElement>,
+  theme: Theme
 ) {
   const { min, max } = getMinMaxOverPeriod(data);
   const periodInfo = HISTORICAL_PERIOD_INFO[selectedPeriod || "1d"];
@@ -124,7 +133,9 @@ function drawGraph(
   ctx?.setLineDash([]);
   data.forEach((point, index) => {
     ctx.lineWidth = "8";
-    ctx.strokeStyle = isUp ? "green" : "red";
+    ctx.strokeStyle = isUp
+      ? theme.semanticColors.gain
+      : theme.semanticColors.loss;
     const x = indexToX(index);
     const y = priceToY(point.close);
     if (!index) {
@@ -140,7 +151,7 @@ function drawGraph(
   ctx.beginPath();
   data.forEach((point, index) => {
     ctx.lineWidth = "2";
-    ctx.strokeStyle = "red";
+    ctx.strokeStyle = theme.colors.red_600;
     const x = indexToX(index);
     const y = priceToY(point.close);
     if (!index) {
@@ -157,7 +168,7 @@ function drawGraph(
 
   let grd = ctx.createLinearGradient(0, priceToY(max), 0, priceToY(min));
   grd.addColorStop(0, isUp ? "#a4dfb4" : "#ffbbbb");
-  grd.addColorStop(1, "white");
+  grd.addColorStop(1, theme.semanticColors.background);
 
   ctx.fillStyle = grd;
 

@@ -19,13 +19,11 @@ type CellProps = {
 
 const CellContainer = styled(View)<{ selected: boolean }>((props) => ({
   flexDirection: "row",
-  height: 60,
-  fontSize: 20,
   backgroundColor: props.selected
     ? props.theme.semanticColors.surfaceSelected
     : props.theme.semanticColors.surface,
   borderRadius: 8,
-  padding: 8,
+  padding: "6px 16px",
   alignItems: "center",
 }));
 
@@ -36,7 +34,25 @@ const ColumnLarge = styled(View)({
 
 const ColumnSmall = styled(View)({
   flex: 1,
+  flexDirection: "column",
+  alignItems: "flex-end",
 });
+
+const PriceQuote = styled(Text)<{ gain: boolean }>((props) => ({
+  color: props.gain
+    ? props.theme.semanticColors.gain
+    : props.theme.semanticColors.loss,
+  marginLeft: 12,
+}));
+
+const PctQuote = styled(Text)<{ gain: boolean }>((props) => ({
+  color: props.gain
+    ? props.theme.semanticColors.gain
+    : props.theme.semanticColors.loss,
+  marginLeft: 12,
+}));
+
+const PriceChangeContainer = styled(View)({ flexDirection: "row" });
 
 const DeleteButton = styled.button({
   height: 20,
@@ -75,8 +91,12 @@ export default function WatchlistCell(props: CellProps) {
   }, [price]);
 
   if (price && prevPrice && prevPrice != price) {
-    color = price > prevPrice ? "green" : "red";
+    color =
+      price > prevPrice ? theme.semanticColors.gain : theme.semanticColors.loss;
   }
+
+  const gain = quote?.price - quote?.prevClose > 0;
+  const plusOrMinus = gain ? "+" : "-";
 
   return (
     <CellContainer
@@ -85,15 +105,31 @@ export default function WatchlistCell(props: CellProps) {
       onMouseLeave={() => setIsHovered(false)}
     >
       <ColumnLarge>
-        <Text>{ticker.toUpperCase()}</Text>
+        <Text textSize="large">{ticker.toUpperCase()}</Text>
       </ColumnLarge>
-      <ColumnSmall>
-        {price && (
-          <Text style={{ textAlign: "end" as "end", color: color }}>
-            {price.toFixed(2)}
-          </Text>
-        )}
-      </ColumnSmall>
+      {quote && (
+        <ColumnSmall>
+          {price && (
+            <Text textSize="large" style={{ color }}>
+              {price.toFixed(2)}
+            </Text>
+          )}
+          <PriceChangeContainer>
+            <PriceQuote gain={gain} textSize="medium">
+              {plusOrMinus}
+              {Math.abs(quote.price - quote.prevClose).toFixed(2)}
+            </PriceQuote>
+            <PctQuote gain={gain} textSize="medium">
+              ({plusOrMinus}
+              {(
+                Math.abs((quote.price - quote.prevClose) / quote.prevClose) *
+                100
+              ).toFixed(2)}
+              %)
+            </PctQuote>
+          </PriceChangeContainer>
+        </ColumnSmall>
+      )}
       {isHovered && (
         <DeleteButton
           onClick={(e) => {

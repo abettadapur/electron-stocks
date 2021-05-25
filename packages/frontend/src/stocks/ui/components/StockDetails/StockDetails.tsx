@@ -20,12 +20,16 @@ type Props = {
 };
 
 const PriceQuote = styled(Text)<{ gain: boolean }>((props) => ({
-  color: props.gain ? "green" : "red",
+  color: props.gain
+    ? props.theme.semanticColors.gain
+    : props.theme.semanticColors.loss,
   marginLeft: 12,
 }));
 
 const PctQuote = styled(Text)<{ gain: boolean }>((props) => ({
-  color: props.gain ? "green" : "red",
+  color: props.gain
+    ? props.theme.semanticColors.gain
+    : props.theme.semanticColors.loss,
   marginLeft: 12,
 }));
 
@@ -45,15 +49,15 @@ function StockDetails(props: Props) {
 
   return (
     <View>
-      <Text>{props.selected.toUpperCase()}</Text>
+      <Text textSize="medium">{props.selected.toUpperCase()}</Text>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Text>${lastQuote.price}</Text>
-        <PriceQuote gain={gain}>
+        <Text textSize="medium">{lastQuote.price}</Text>
+        <PriceQuote textSize="medium" gain={gain}>
           {plusOrMinus}
           {Math.abs(lastQuote.price - lastQuote.prevClose).toFixed(2)}
         </PriceQuote>
-        <PctQuote gain={gain}>
-          (
+        <PctQuote textSize="medium" gain={gain}>
+          ({plusOrMinus}
           {(
             ((lastQuote.price - lastQuote.prevClose) / lastQuote.prevClose) *
             100
