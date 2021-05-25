@@ -5,13 +5,12 @@ import {
   Period,
 } from "frontend/stocks/redux/stocks/Stocks.types";
 import View from "../../view/View";
-import { MdArrowDropUp } from "react-icons/md";
 import HistoricalGraph from "../HistoricalGraph/HistoricalGraph";
 import HistoricalPeriodButtons from "../HistoricalPeriodButtons/HistoricalPeriodButtons";
 import { getQuote } from "frontend/stocks/redux/stocks/StocksSelectors";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import Text from "../text/Text";
-import Icon from "../icon/Icon";
+import styled from "frontend/styled";
 
 type Props = {
   selected: string;
@@ -19,6 +18,16 @@ type Props = {
   lastQuote: IEXStockQuote | undefined;
   tickerInvalid: boolean;
 };
+
+const PriceQuote = styled(Text)<{ gain: boolean }>(props => ({
+  color: props.gain ? "green" : "red",
+  marginLeft: 12
+}));
+
+const PctQuote = styled(Text)<{ gain: boolean }>(props => ({
+  color: props.gain ? "green" : "red",
+  marginLeft: 12
+}));
 
 function StockDetails(props: Props) {
   let { selected, lastQuote, tickerInvalid } = props;
@@ -31,30 +40,24 @@ function StockDetails(props: Props) {
     return null;
   }
 
+  const gain = lastQuote.price - lastQuote.prevClose > 0;
+  const plusOrMinus = gain ? '+' : '-';
+
   return (
     <View>
       <Text>{props.selected.toUpperCase()}</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Text>${lastQuote.price}</Text>
-        <Text
-          style={{
-            color: lastQuote.price > lastQuote.prevClose ? "green" : "red",
-          }}
-        >
-          + ${(lastQuote.price - lastQuote.prevClose).toFixed(2)} (
+        <PriceQuote gain={gain}>
+          {plusOrMinus}{Math.abs((lastQuote.price - lastQuote.prevClose)).toFixed(2)}
+        </PriceQuote>
+        <PctQuote gain={gain}>(
           {(
             ((lastQuote.price - lastQuote.prevClose) / lastQuote.prevClose) *
             100
           ).toFixed(2)}
           %)
-          <Icon
-            size="medium"
-            icon={MdArrowDropUp}
-            style={{
-              color: lastQuote.price > lastQuote.prevClose ? "green" : "red",
-            }}
-          />
-        </Text>
+        </PctQuote>
       </View>
       <View>
         <HistoricalGraph />
