@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import View from "../view/View";
 import styled from "../../../styled";
+import Text from "../components/text/Text";
 
 type PivotItem = {
   key: string;
@@ -82,9 +83,9 @@ const PivotItem = React.forwardRef(function PivotItem(
   }, [itemKey]);
 
   return (
-    <View ref={ref} {...rest} onClick={_onClick}>
+    <Text ref={ref} {...rest} onClick={_onClick}>
       {title}
-    </View>
+    </Text>
   );
 });
 

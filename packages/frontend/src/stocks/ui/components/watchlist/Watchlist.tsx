@@ -2,57 +2,34 @@ import React, { useCallback, useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { StocksActions } from "frontend/stocks/redux/stocks/StocksActions";
 import { StocksAwareState } from "frontend/stocks/redux/stocks/Stocks.types";
-import { getWatchlist } from "frontend/stocks/redux/stocks/StocksSelectors";
+import { getSelectedTicker, getWatchlist } from "frontend/stocks/redux/stocks/StocksSelectors";
 import View from "../../view/View";
 import styled from "../../../../styled";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import { getQuotes } from "frontend/stocks/redux/stocks/StocksSelectors";
+import WatchlistCell from "./WatchListCell";
 
 type MappedProps = {
+  selectedTicker: string,
   watchlist: string[];
   quotes: { [ticker: string]: IEXStockQuote }
 };
 
 type Props = MappedProps & typeof Actions;
 
-type CellProps = {
-  ticker: string;
-  onRemoveClicked: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, w: string) => void;
-  quote: IEXStockQuote;
-}
-
 const WatchlistContainer = styled(View)({
   borderRight: "1px solid black",
   flex: 1,
+  marginLeft: 8,
+  paddingRight: 8
 });
 
 const Row = styled(View)({
   flexDirection: "row",
 });
 
-const TallRow = styled(Row)({
-  height: 60,
-  lineHeight: '60px',
-  fontSize: 20
-});
-
-const ColumnLarge = styled(View)({
-  flex: 2,
-  maxWidth: '40%'
-});
-
-const ColumnSmall = styled(View)({
-  flex: 1
-});
-
-const DeleteButton = styled.button({
-  height: 20,
-  background: 'Transparent',
-  border: 'none'
-});
-
 function Watchlist(props: Props) {
-  const { addToWatchlist, removeFromWatchlist, setSelectedStock, watchlist, quotes } = props;
+  const { addToWatchlist, removeFromWatchlist, selectedTicker, setSelectedStock, watchlist, quotes } = props;
   const [inputValue, setInputValue] = useState("");
 
   const onInputChange = useCallback(
@@ -81,65 +58,20 @@ function Watchlist(props: Props) {
 
   return (
     <WatchlistContainer>
-      <Row>
+      <Row style={{ marginTop: 8 }}>
         <input type="text" value={inputValue} onChange={onInputChange} onKeyDown={onInputKeyDown} />
         <button onClick={onAddTicker}>Add Ticker</button>
       </Row>
       {watchlist.map((w, i) => (
-        <View key={i} onClick={() => setSelectedStock(w)}>
-          <WatchlistCell ticker={w} quote={quotes[w.toLowerCase()]} onRemoveClicked={onRemoveTicker} />
+        <View key={i} onClick={() => setSelectedStock(w)} style={{ marginTop: 12 }}>
+          <WatchlistCell ticker={w} selected={w === selectedTicker} quote={quotes[w.toLowerCase()]} onRemoveClicked={onRemoveTicker} />
         </View>
       ))}
     </WatchlistContainer>
   );
 }
 
-function WatchlistCell(props: CellProps) {
-  const { ticker, quote, onRemoveClicked } = props;
-  const [isHovered, setIsHovered] = useState(false);
-  const [prevPrice, setPrevPrice] = useState(quote?.price);
-  const price = quote?.price;
-  let color = 'black';
 
-  useEffect(() => {
-    if (price && prevPrice != price) {
-      if (prevPrice) {
-        setTimeout(() => {
-          setPrevPrice(price);
-        }, 1500);
-      }
-      else {
-        setPrevPrice(price);
-      }
-    }
-  }, [price])
-
-  if (price && prevPrice && prevPrice != price) {
-    color = price > prevPrice ? 'green' : 'red';
-  }
-
-  return (
-    <TallRow onMouseOver={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
-      <ColumnLarge>
-        <View style={{ paddingLeft: 20 }}>
-          {ticker}
-        </View>
-      </ColumnLarge>
-      <ColumnSmall>
-        {price && <View style={{ textAlign: 'end' as 'end', color: color }}>
-          {price}
-        </View>}
-      </ColumnSmall>
-      <ColumnSmall style={{ maxWidth: 20 }}>
-        <View style={{ textAlign: 'end' as 'end', display: isHovered ? 'block' : 'none' }}>
-          {isHovered && <DeleteButton onClick={(e) => { onRemoveClicked(e, ticker) }}>
-            X
-          </DeleteButton>}
-        </View>
-      </ColumnSmall>
-    </TallRow>
-  )
-}
 
 const Actions = {
   addToWatchlist: StocksActions.addTickerToWatchlist,
@@ -150,6 +82,7 @@ const Actions = {
 function mapStateToProps(state: StocksAwareState): MappedProps {
   return {
     watchlist: getWatchlist(state),
+    selectedTicker: getSelectedTicker(state),
     quotes: getQuotes(state)
   };
 }

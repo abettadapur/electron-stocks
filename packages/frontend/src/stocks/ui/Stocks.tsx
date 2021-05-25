@@ -1,16 +1,22 @@
 import React from "react";
 import MenuBar from "./components/MenuBar/MenuBar";
 import { connect } from "react-redux";
-import { StocksState, StocksAwareState } from "../redux/stocks/Stocks.types";
+import { StocksAwareState } from "../redux/stocks/Stocks.types";
 import StocksView from "./components/stocksView/StocksView";
 import View from "./view/View";
+import styled from "frontend/styled";
+
+const StocksContainer = styled(View)(props => ({
+  backgroundColor: props.theme.semanticColors.background,
+  flex: 1
+}));
 
 function Stocks(props: { menuItem: string }) {
   return (
-    <View style={{ flex: 1 }}>
+    <StocksContainer>
       <MenuBar />
       {props.menuItem === "stocks" && <StocksView />}
-    </View>
+    </StocksContainer>
   );
 }
 

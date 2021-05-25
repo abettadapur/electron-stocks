@@ -10,6 +10,7 @@ import HistoricalGraph from "../HistoricalGraph/HistoricalGraph";
 import HistoricalPeriodButtons from "../HistoricalPeriodButtons/HistoricalPeriodButtons";
 import { getQuote } from "frontend/stocks/redux/stocks/StocksSelectors";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import Text from "../text/Text";
 
 type Props = {
   selected: string;
@@ -31,29 +32,27 @@ function StockDetails(props: Props) {
 
   return (
     <View>
-      <View>{props.selected}</View>
-      <View>
-        <div>
-          <span>${lastQuote.price}</span>
-          <span
+      <Text>{props.selected.toUpperCase()}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Text>${lastQuote.price}</Text>
+        <Text
+          style={{
+            color: lastQuote.price > lastQuote.prevClose ? "green" : "red",
+          }}
+        >
+          + ${(lastQuote.price - lastQuote.prevClose).toFixed(2)} (
+          {(
+            ((lastQuote.price - lastQuote.prevClose) / lastQuote.prevClose) *
+            100
+          ).toFixed(2)}
+          %)
+          <IoMdArrowDropup
             style={{
+              fontSize: 25,
               color: lastQuote.price > lastQuote.prevClose ? "green" : "red",
             }}
-          >
-            + ${(lastQuote.price - lastQuote.prevClose).toFixed(2)} (
-            {(
-              ((lastQuote.price - lastQuote.prevClose) / lastQuote.prevClose) *
-              100
-            ).toFixed(2)}
-            %)
-            <IoMdArrowDropup
-              style={{
-                fontSize: 25,
-                color: lastQuote.price > lastQuote.prevClose ? "green" : "red",
-              }}
-            />
-          </span>
-        </div>
+          />
+        </Text>
       </View>
       <View>
         <HistoricalGraph />
