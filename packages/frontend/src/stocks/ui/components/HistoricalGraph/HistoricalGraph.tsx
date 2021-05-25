@@ -36,6 +36,7 @@ function HistoricalGraph(props: Props) {
     useState<{ height: number; width: number } | null>(null);
   const canvasRef = React.useRef() as MutableRefObject<HTMLCanvasElement>;
   const mousePointRef = React.useRef<Point | null>(null);
+  const mouseClickPointRef = React.useRef<Point | null>(null);
   const theme = useTheme();
 
   useEffect(() => {
@@ -66,6 +67,7 @@ function HistoricalGraph(props: Props) {
         period,
         lastQuote,
         mousePointRef.current,
+        mouseClickPointRef.current,
         canvasRef,
         theme
       );
@@ -77,6 +79,22 @@ function HistoricalGraph(props: Props) {
       <GraphCanvas
         height={canvasDimensions?.height || 0}
         width={canvasDimensions?.width || 0}
+        onMouseLeave={(e) => {
+          mousePointRef.current = null;
+          requestAnimationFrame(() => {
+            if (historicalData && historicalData.length > 0) {
+              drawGraph(
+                historicalData,
+                period,
+                lastQuote,
+                mousePointRef.current,
+                mouseClickPointRef.current,
+                canvasRef,
+                theme
+              );
+            }
+          });
+        }}
         onMouseMove={(e) => {
           mousePointRef.current = { x: e.clientX, y: e.clientY };
           requestAnimationFrame(() => {
@@ -86,13 +104,19 @@ function HistoricalGraph(props: Props) {
                 period,
                 lastQuote,
                 mousePointRef.current,
+                mouseClickPointRef.current,
                 canvasRef,
                 theme
               );
             }
           });
         }}
-        onMouseDown={(e) => {}}
+        onMouseDown={(e) => {
+          mouseClickPointRef.current = { x: e.clientX, y: e.clientY };
+        }}
+        onMouseUp={(e) => {
+          mouseClickPointRef.current = null;
+        }}
         ref={canvasRef}
         style={{ border: "1px solid black" }}
       ></GraphCanvas>
@@ -115,6 +139,7 @@ function drawGraph(
   selectedPeriod: Period,
   lastQuote: IEXStockQuote,
   mousePoint: Point | null,
+  mouseClickPoint: Point | null,
   canvasRef: React.MutableRefObject<HTMLCanvasElement>,
   theme: Theme
 ) {
@@ -123,7 +148,10 @@ function drawGraph(
   const yDividerCount = periodInfo.yDividerCount;
   let yDividers = [min];
   let dividerHeight = (max - min) / (yDividerCount - 1);
-  const isUp = data[data.length - 1].close > lastQuote.prevClose;
+  const isUp =
+    selectedPeriod === "1d"
+      ? data[data.length - 1].close > lastQuote.prevClose
+      : data[0].close < lastQuote.prevClose;
 
   for (var i = 0; i < yDividerCount - 2; i++) {
     yDividers.push(min + dividerHeight * (i + 1));
@@ -164,6 +192,7 @@ function drawGraph(
     return;
   }
 
+  // Line Chart
   ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
   ctx.beginPath();
   ctx?.setLineDash([]);
@@ -184,23 +213,39 @@ function drawGraph(
   ctx?.stroke();
   ctx?.closePath();
 
+  // Chart Fill
   ctx.beginPath();
+  let minIndex = 0;
+  let maxIndex = data.length - 1;
+  if (mousePoint && mouseClickPoint) {
+    const clickCanvasPoint = mousePointToCanvasPoint(mouseClickPoint);
+    const currentCanvasPoint = mousePointToCanvasPoint(mousePoint);
+    minIndex = xToIndex(Math.min(currentCanvasPoint.x, clickCanvasPoint.x));
+    maxIndex = xToIndex(Math.max(currentCanvasPoint.x, clickCanvasPoint.x));
+  }
+
   data.forEach((point, index) => {
+    if (index < minIndex || index > maxIndex) {
+      return;
+    }
+
     ctx!.lineWidth = 4;
-    ctx!.strokeStyle = theme.colors.red_600;
+    ctx!.strokeStyle = isUp
+      ? theme.semanticColors.gain
+      : theme.semanticColors.loss;
     const x = indexToX(index);
     const y = priceToY(point.close);
-    if (!index) {
+    if (!index || index === minIndex) {
       // start line at first index price
       ctx?.moveTo(x, y);
     } else {
       ctx?.lineTo(x, y);
     }
   });
-  ctx?.lineTo(canvasRef.current.width, priceToY(data[data.length - 1].close));
-  ctx?.lineTo(canvasRef.current.width, canvasRef.current.height);
-  ctx?.lineTo(0, canvasRef.current.height);
-  ctx?.lineTo(indexToX(0), priceToY(data[0].close));
+  ctx?.lineTo(indexToX(maxIndex), priceToY(data[maxIndex].close));
+  ctx?.lineTo(indexToX(maxIndex), canvasRef.current.height);
+  ctx?.lineTo(indexToX(minIndex), canvasRef.current.height);
+  ctx?.lineTo(indexToX(minIndex), priceToY(data[minIndex].close));
 
   let grd = ctx.createLinearGradient(0, priceToY(max), 0, priceToY(min));
   grd.addColorStop(0, isUp ? "#a4dfb4" : "#ffbbbb");
@@ -211,9 +256,12 @@ function drawGraph(
   ctx!.fill();
   ctx!.closePath();
 
-  // Draw the mouse line
-  if (mousePoint) {
-    const canvasPoint = mousePointToCanvasPoint(mousePoint);
+  function drawMousePoint(_mousePoint: Point) {
+    if (!ctx) {
+      return;
+    }
+
+    const canvasPoint = mousePointToCanvasPoint(_mousePoint);
     ctx.beginPath();
     ctx.setLineDash([5]);
     ctx.strokeStyle = theme.semanticColors.textPrimary;
@@ -238,12 +286,50 @@ function drawGraph(
     ctx.arc(canvasPoint.x, y, 6, 0, 2 * Math.PI);
     ctx.closePath();
     ctx.fill();
+  }
 
-    // Draw the price text
+  // Draw the mouse line
+  if (mousePoint) {
+    drawMousePoint(mousePoint);
+    if (mouseClickPoint) {
+      drawMousePoint(mouseClickPoint);
+    }
 
-    ctx.fillStyle = theme.semanticColors.textPrimary;
-    ctx.font = "18px Segoe UI";
-    ctx.fillText(point.close.toFixed(2).toString(), canvasPoint.x + 4, 40);
+    const canvasPoint = mousePointToCanvasPoint(mousePoint);
+    // Draw the price point on the graph
+    const index = xToIndex(canvasPoint.x);
+    const point = data[index];
+
+    if (mouseClickPoint) {
+      const canvasClickPoint = mousePointToCanvasPoint(mouseClickPoint);
+
+      const beginIndex = xToIndex(Math.min(canvasPoint.x, canvasClickPoint.x));
+      const endIndex = xToIndex(Math.max(canvasPoint.x, canvasClickPoint.x));
+
+      const beginPoint = data[beginIndex];
+      const endPoint = data[endIndex];
+      const diff = endPoint.close - beginPoint.close;
+      const diffPct = (diff / beginPoint.close) * 100;
+      const gain = diff > 0;
+
+      // Draw the price text
+      ctx.fillStyle = gain
+        ? theme.semanticColors.gain
+        : theme.semanticColors.loss;
+      ctx.font = "18px Segoe UI";
+      ctx.fillText(
+        `${gain ? "+" : "-"} ${Math.abs(diff).toFixed(2)} (${Math.abs(
+          diffPct
+        ).toFixed(2)}%)`,
+        canvasPoint.x + 4,
+        40
+      );
+    } else {
+      // Draw the price text
+      ctx.fillStyle = theme.semanticColors.textPrimary;
+      ctx.font = "18px Segoe UI";
+      ctx.fillText(`${point.close.toFixed(2)}`, canvasPoint.x + 4, 40);
+    }
   }
 
   // Draw y dividers

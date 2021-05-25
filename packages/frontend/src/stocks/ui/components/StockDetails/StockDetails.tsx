@@ -58,9 +58,9 @@ function StockDetails(props: Props) {
         </PriceQuote>
         <PctQuote textSize="medium" gain={gain}>
           ({plusOrMinus}
-          {(
+          {Math.abs(
             ((lastQuote.price - lastQuote.prevClose) / lastQuote.prevClose) *
-            100
+              100
           ).toFixed(2)}
           %)
         </PctQuote>
