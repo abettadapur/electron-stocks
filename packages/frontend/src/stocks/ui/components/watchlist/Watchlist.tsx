@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback } from "react";
 import { connect } from "react-redux";
 import { StocksActions } from "frontend/stocks/redux/stocks/StocksActions";
 import { StocksAwareState } from "frontend/stocks/redux/stocks/Stocks.types";
@@ -11,6 +11,7 @@ import styled from "../../../../styled";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import { getQuotes } from "frontend/stocks/redux/stocks/StocksSelectors";
 import WatchlistCell from "./WatchListCell";
+import SearchBar from "../SearchBar/SearchBar";
 
 type MappedProps = {
   selectedTicker: string;
@@ -24,44 +25,38 @@ const WatchlistContainer = styled(View)({
   borderRight: "1px solid black",
   flex: 1,
   marginLeft: 8,
+  marginTop: 8,
   paddingRight: 8,
 });
 
-const Row = styled(View)({
-  flexDirection: "row",
+const SearchBarContainer = styled(View)({
+  paddingRight: 12,
 });
+
+const ScrollView = styled(View)((props) => ({
+  flex: 1,
+  marginTop: 8,
+  paddingRight: 8,
+  overflowY: "auto",
+  overflowX: "hidden",
+
+  "::-webkit-scrollbar": {
+    width: 7,
+  },
+
+  "::-webkit-scrollbar-thumb": {
+    backgroundColor: props.theme.semanticColors.surface,
+  },
+}));
 
 function Watchlist(props: Props) {
   const {
-    addToWatchlist,
     removeFromWatchlist,
     selectedTicker,
     setSelectedStock,
     watchlist,
     quotes,
   } = props;
-  const [inputValue, setInputValue] = useState("");
-
-  const onInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInputValue(event.target.value);
-    },
-    [setInputValue]
-  );
-
-  const onAddTicker = useCallback(() => {
-    addToWatchlist(inputValue);
-    setInputValue("");
-  }, [inputValue, setInputValue]);
-
-  const onInputKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "Enter") {
-        onAddTicker();
-      }
-    },
-    [onAddTicker]
-  );
 
   const onRemoveTicker = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, w: string) => {
@@ -73,29 +68,25 @@ function Watchlist(props: Props) {
 
   return (
     <WatchlistContainer>
-      <Row style={{ marginTop: 8 }}>
-        <input
-          type="text"
-          value={inputValue}
-          onChange={onInputChange}
-          onKeyDown={onInputKeyDown}
-        />
-        <button onClick={onAddTicker}>Add Ticker</button>
-      </Row>
-      {watchlist.map((w, i) => (
-        <View
-          key={i}
-          onClick={() => setSelectedStock(w)}
-          style={{ marginTop: 12 }}
-        >
-          <WatchlistCell
-            ticker={w}
-            selected={w === selectedTicker}
-            quote={quotes[w.toLowerCase()]}
-            onRemoveClicked={onRemoveTicker}
-          />
-        </View>
-      ))}
+      <SearchBarContainer>
+        <SearchBar />
+      </SearchBarContainer>
+      <ScrollView>
+        {watchlist.map((w, i) => (
+          <View
+            key={i}
+            onClick={() => setSelectedStock(w)}
+            style={{ marginTop: i !== 0 ? 12 : undefined }}
+          >
+            <WatchlistCell
+              ticker={w}
+              selected={w === selectedTicker}
+              quote={quotes[w.toLowerCase()]}
+              onRemoveClicked={onRemoveTicker}
+            />
+          </View>
+        ))}
+      </ScrollView>
     </WatchlistContainer>
   );
 }

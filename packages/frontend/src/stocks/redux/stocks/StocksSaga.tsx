@@ -66,8 +66,13 @@ export default function* StocksSaga() {
   yield fork(listenToSocket, socketChannel);
   yield call(loadQuotes, watchlist);
   yield takeLatest(StocksActions.addTickerToWatchlist.type, saveWatchlist);
+  yield takeLatest(StocksActions.removeTickerFromWatchlist.type, saveWatchlist);
   yield takeLatest(StocksActions.setSelectedStock.type, onStockChanged);
   yield takeLatest(StocksActions.setSelectedPeriod.type, onPeriodChanged);
+
+  if (watchlist && watchlist.length > 0) {
+    yield put(StocksActions.setSelectedStock(watchlist[0]));
+  }
 }
 
 function* loadWatchlist() {

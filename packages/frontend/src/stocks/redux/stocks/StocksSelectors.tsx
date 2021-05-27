@@ -1,7 +1,8 @@
 import { StocksAwareState } from "./Stocks.types";
+import { createSelector } from "reselect";
 
 export function getWatchlist(state: StocksAwareState) {
-  return state.stocks.watchlist;
+  return Array.from(state.stocks.watchlist);
 }
 
 export function getSelectedTicker(state: StocksAwareState) {
@@ -25,3 +26,11 @@ export function getSelectedHistoricalData(state: StocksAwareState) {
     getSelectedPeriod(state)
   ];
 }
+
+export const selectIsSelectedTickerInWatchlist = createSelector(
+  (s) => s.stocks.watchlist,
+  getSelectedTicker,
+  (watchlist, ticker) => {
+    return watchlist.has(ticker.toLowerCase()) || watchlist.has(ticker);
+  }
+);

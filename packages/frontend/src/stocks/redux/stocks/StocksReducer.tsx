@@ -4,7 +4,7 @@ import { StocksAction, StocksActions } from "./StocksActions";
 
 const StocksReducer = makeReducer(
   {
-    watchlist: [],
+    watchlist: new Set<string>(),
     menuBar: { menuItem: "stocks" },
     selected: "",
     selectedPeriod: "1d" as Period,
@@ -20,20 +20,18 @@ const StocksReducer = makeReducer(
       }
 
       case StocksActions.addTickerToWatchlist.type: {
-        state.watchlist.push(action.payload.ticker);
+        state.watchlist.add(action.payload.ticker.toLowerCase());
         break;
       }
 
       case StocksActions.removeTickerFromWatchlist.type: {
-        state.watchlist.splice(
-          state.watchlist.indexOf(action.payload.ticker.toLowerCase()),
-          1
-        );
+        state.watchlist.delete(action.payload.ticker);
+        state.watchlist.delete(action.payload.ticker.toLowerCase());
         break;
       }
 
       case StocksActions.setWatchlist.type: {
-        state.watchlist = action.payload.watchlist;
+        state.watchlist = new Set(action.payload.watchlist);
         break;
       }
 

@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
+import { enableMapSet } from "immer";
 import createStore from "frontend/stocks/redux/createStore";
 import Stocks from "frontend/stocks/ui/Stocks";
 import UIRoot from "frontend/stocks/ui/UIRoot";
@@ -15,6 +16,7 @@ function StocksRoot(props: { store: any }) {
   );
 }
 
+enableMapSet();
 const container = document.getElementById("root");
 const store = createStore();
 

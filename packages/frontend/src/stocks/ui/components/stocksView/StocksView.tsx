@@ -25,7 +25,6 @@ export default function StocksView() {
         <Watchlist></Watchlist>
       </LeftContainer>
       <RightContainer>
-        <SearchBar></SearchBar>
         <StockDetails></StockDetails>
       </RightContainer>
     </StocksViewContainer>

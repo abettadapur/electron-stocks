@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { connect } from "react-redux";
 import {
   StocksAwareState,
@@ -7,17 +7,27 @@ import {
 import View from "../../view/View";
 import HistoricalGraph from "../HistoricalGraph/HistoricalGraph";
 import HistoricalPeriodButtons from "../HistoricalPeriodButtons/HistoricalPeriodButtons";
-import { getQuote } from "frontend/stocks/redux/stocks/StocksSelectors";
+import {
+  getQuote,
+  selectIsSelectedTickerInWatchlist,
+} from "frontend/stocks/redux/stocks/StocksSelectors";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import Text from "../text/Text";
 import styled from "frontend/styled";
+import { MdStar, MdStarBorder } from "react-icons/md";
+import IconButton from "../button/IconButton";
+import { useTheme } from "../../theme/Theme";
+import { StocksActions } from "frontend/stocks/redux/stocks/StocksActions";
 
-type Props = {
+type MappedProps = {
   selected: string;
   selectedPeriod: Period;
+  isInWatchlist: boolean;
   lastQuote: IEXStockQuote | undefined;
   tickerInvalid: boolean;
 };
+
+type Props = MappedProps & typeof Actions;
 
 const PriceQuote = styled(Text)<{ gain: boolean }>((props) => ({
   color: props.gain
@@ -34,7 +44,34 @@ const PctQuote = styled(Text)<{ gain: boolean }>((props) => ({
 }));
 
 function StockDetails(props: Props) {
-  let { selected, lastQuote, tickerInvalid } = props;
+  let {
+    selected,
+    isInWatchlist,
+    lastQuote,
+    tickerInvalid,
+    addToWatchlist,
+    removeFromWatchlist,
+  } = props;
+  const theme = useTheme();
+
+  const canToggleWatchlist = selected && lastQuote && !tickerInvalid;
+
+  const toggleWatchlist = useCallback(() => {
+    if (!canToggleWatchlist) {
+      return;
+    }
+    if (!isInWatchlist) {
+      addToWatchlist(selected);
+    } else {
+      removeFromWatchlist(selected);
+    }
+  }, [
+    canToggleWatchlist,
+    selected,
+    isInWatchlist,
+    addToWatchlist,
+    removeFromWatchlist,
+  ]);
 
   if (tickerInvalid) {
     return <div>Ticker Invalid</div>;
@@ -48,22 +85,35 @@ function StockDetails(props: Props) {
   const plusOrMinus = gain ? "+" : "-";
 
   return (
-    <View style={{ flex: 1 }}>
-      <Text textSize="medium">{props.selected.toUpperCase()}</Text>
+    <View style={{ flex: 1, padding: 8 }}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Text textSize="medium">{lastQuote.price}</Text>
-        <PriceQuote textSize="medium" gain={gain}>
-          {plusOrMinus}
-          {Math.abs(lastQuote.price - lastQuote.prevClose).toFixed(2)}
-        </PriceQuote>
-        <PctQuote textSize="medium" gain={gain}>
-          ({plusOrMinus}
-          {Math.abs(
-            ((lastQuote.price - lastQuote.prevClose) / lastQuote.prevClose) *
-              100
-          ).toFixed(2)}
-          %)
-        </PctQuote>
+        <View>
+          <Text textSize="medium">{props.selected.toUpperCase()}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text textSize="medium">{lastQuote.price}</Text>
+            <PriceQuote textSize="medium" gain={gain}>
+              {plusOrMinus}
+              {Math.abs(lastQuote.price - lastQuote.prevClose).toFixed(2)}
+            </PriceQuote>
+            <PctQuote textSize="medium" gain={gain}>
+              ({plusOrMinus}
+              {Math.abs(
+                ((lastQuote.price - lastQuote.prevClose) /
+                  lastQuote.prevClose) *
+                  100
+              ).toFixed(2)}
+              %)
+            </PctQuote>
+          </View>
+        </View>
+        <IconButton
+          icon={isInWatchlist ? MdStar : MdStarBorder}
+          iconColor={theme.colors.yellow_500}
+          size="medium"
+          transparent={true}
+          style={{ marginLeft: "auto" }}
+          onClick={toggleWatchlist}
+        />
       </View>
       <View style={{ flex: 1, maxHeight: 500 }}>
         <HistoricalGraph />
@@ -75,11 +125,17 @@ function StockDetails(props: Props) {
   );
 }
 
-const mapStateToProps = (state: StocksAwareState): Props => ({
+const mapStateToProps = (state: StocksAwareState): MappedProps => ({
   selected: state.stocks.selected,
   selectedPeriod: state.stocks.selectedPeriod,
   lastQuote: getQuote(state, state.stocks.selected),
+  isInWatchlist: selectIsSelectedTickerInWatchlist(state),
   tickerInvalid: state.stocks.tickerInvalid,
 });
 
-export default connect(mapStateToProps)(StockDetails);
+const Actions = {
+  addToWatchlist: StocksActions.addTickerToWatchlist,
+  removeFromWatchlist: StocksActions.removeTickerFromWatchlist,
+};
+
+export default connect(mapStateToProps, Actions)(StockDetails);

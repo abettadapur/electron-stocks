@@ -34,6 +34,7 @@ function HistoricalGraph(props: Props) {
   let { historicalData, period, lastQuote } = props;
   const [canvasDimensions, setCanvasDimensions] =
     useState<{ height: number; width: number } | null>(null);
+  const mouseIntersectingRef = React.useRef(false);
   const canvasRef = React.useRef() as MutableRefObject<HTMLCanvasElement>;
   const mousePointRef = React.useRef<Point | null>(null);
   const mouseClickPointRef = React.useRef<Point | null>(null);
@@ -74,48 +75,49 @@ function HistoricalGraph(props: Props) {
     }
   }, [historicalData, canvasDimensions]);
 
+  function redraw() {
+    requestAnimationFrame(() => {
+      if (historicalData && historicalData.length > 0) {
+        drawGraph(
+          historicalData,
+          period,
+          lastQuote,
+          mousePointRef.current,
+          mouseClickPointRef.current,
+          canvasRef,
+          theme
+        );
+      }
+    });
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <GraphCanvas
         height={canvasDimensions?.height || 0}
         width={canvasDimensions?.width || 0}
-        onMouseLeave={(e) => {
-          mousePointRef.current = null;
-          requestAnimationFrame(() => {
-            if (historicalData && historicalData.length > 0) {
-              drawGraph(
-                historicalData,
-                period,
-                lastQuote,
-                mousePointRef.current,
-                mouseClickPointRef.current,
-                canvasRef,
-                theme
-              );
-            }
-          });
-        }}
         onMouseMove={(e) => {
-          mousePointRef.current = { x: e.clientX, y: e.clientY };
-          requestAnimationFrame(() => {
-            if (historicalData && historicalData.length > 0) {
-              drawGraph(
-                historicalData,
-                period,
-                lastQuote,
-                mousePointRef.current,
-                mouseClickPointRef.current,
-                canvasRef,
-                theme
-              );
-            }
-          });
+          if (mouseIntersectingRef.current) {
+            mousePointRef.current = { x: e.clientX, y: e.clientY };
+            redraw();
+          }
         }}
         onMouseDown={(e) => {
           mouseClickPointRef.current = { x: e.clientX, y: e.clientY };
+          redraw();
         }}
         onMouseUp={(e) => {
           mouseClickPointRef.current = null;
+          redraw();
+        }}
+        onMouseEnter={() => {
+          mouseIntersectingRef.current = true;
+          redraw();
+        }}
+        onMouseLeave={() => {
+          mouseIntersectingRef.current = false;
+          mousePointRef.current = null;
+          redraw();
         }}
         ref={canvasRef}
         style={{ border: "1px solid black" }}

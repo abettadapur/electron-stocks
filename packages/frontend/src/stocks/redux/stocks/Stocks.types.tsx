@@ -10,7 +10,7 @@ export type StocksState = {
     [ticker: string]: { [period in Period]: IEXHistorical[] | EODHistorical[] };
   };
   quotes: { [ticker: string]: IEXStockQuote };
-  watchlist: string[];
+  watchlist: Set<string>;
   selected: string;
   selectedPeriod: Period;
   tickerInvalid: boolean;

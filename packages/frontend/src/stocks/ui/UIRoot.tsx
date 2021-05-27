@@ -28,4 +28,17 @@ const globalStyles = {
     cursor: "default",
     padding: 0,
   },
+  "::-webkit-scrollbar": {
+    width: 12,
+  },
+
+  "::-webkit-scrollbar-track": {
+    boxShadow: "inset 0 0 6px rgba(0,0,0,0.3)",
+    borderRadius: 10,
+  },
+
+  "::-webkit-scrollbar-thumb": {
+    borderRadius: 10,
+    boxShadow: "inset 0 0 6px rgba(0,0,0,0.5)",
+  },
 } as const;
