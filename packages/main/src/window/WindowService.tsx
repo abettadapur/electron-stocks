@@ -8,6 +8,7 @@ export class __WindowService {
     const win = new BrowserWindow({
       show: false,
       resizable: true, // Have this on by default, so Windows OS snaps correctly (https://github.com/electron/electron/issues/11568)
+      frame: false,
       webPreferences: {
         nativeWindowOpen: true,
         preload: path.resolve(

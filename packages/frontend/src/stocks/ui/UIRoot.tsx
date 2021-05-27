@@ -2,6 +2,7 @@ import React, { useMemo, StrictMode } from "react";
 import createCache from "@emotion/cache";
 import { CacheProvider, Global } from "@emotion/core";
 import { ThemeContextProvider } from "./theme/Theme";
+import TitleBar from "./components/titlebar/TitleBar";
 
 export default function UIRoot(props: React.PropsWithChildren<{}>) {
   const emotionCache = useMemo(() => createCache({ prefix: false }), []);
@@ -10,7 +11,10 @@ export default function UIRoot(props: React.PropsWithChildren<{}>) {
     <StrictMode>
       <CacheProvider value={emotionCache}>
         <Global styles={globalStyles} />
-        <ThemeContextProvider>{props.children}</ThemeContextProvider>
+        <ThemeContextProvider>
+          <TitleBar />
+          {props.children}
+        </ThemeContextProvider>
       </CacheProvider>
     </StrictMode>
   );
@@ -22,23 +26,11 @@ const globalStyles = {
     width: "100vw",
     margin: 0,
     display: "flex",
+    flexDirection: "column",
     fontFamily: "Segoe UI",
     overflow: "hidden",
     userSelect: "none",
     cursor: "default",
     padding: 0,
-  },
-  "::-webkit-scrollbar": {
-    width: 12,
-  },
-
-  "::-webkit-scrollbar-track": {
-    boxShadow: "inset 0 0 6px rgba(0,0,0,0.3)",
-    borderRadius: 10,
-  },
-
-  "::-webkit-scrollbar-thumb": {
-    borderRadius: 10,
-    boxShadow: "inset 0 0 6px rgba(0,0,0,0.5)",
   },
 } as const;
