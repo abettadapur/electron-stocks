@@ -1,7 +1,8 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "frontend/styled";
 import View from "../../view/View";
 import Text from "../text/Text";
+import bridge from "frontend/bridge";
 
 const TitleBarContainer = styled(View)((props) => ({
   height: 30,
@@ -48,11 +49,31 @@ const CloseButton = styled(Button)({
 });
 
 export default function TitleBar() {
-  const closeWindow = useCallback(() => {}, []);
+  const [isMaximized, setIsMaximized] = useState(false);
+  useEffect(() => {
+    const isWindowMaximized = bridge.window.isMaximized();
+    if (isWindowMaximized !== isMaximized) {
+      setIsMaximized(bridge.window.isMaximized);
+    }
+  }, []);
 
-  const maximizeWindow = useCallback(() => {}, []);
+  const closeWindow = useCallback(() => {
+    bridge.window.close();
+  }, []);
 
-  const minimizeWindow = useCallback(() => {}, []);
+  const maximizeWindow = useCallback(() => {
+    if (isMaximized) {
+      bridge.window.unmaximize();
+      setIsMaximized(false);
+    } else {
+      bridge.window.maximize();
+      setIsMaximized(true);
+    }
+  }, [isMaximized]);
+
+  const minimizeWindow = useCallback(() => {
+    bridge.window.minimize();
+  }, []);
 
   return (
     <TitleBarContainer>
@@ -60,9 +81,11 @@ export default function TitleBar() {
         <Text textSize="small">Stocks</Text>
       </TitleContainer>
       <ButtonsContainer>
-        <Button>{"\uE921"}</Button>
-        <Button>{"\uE922"}</Button>
-        <CloseButton>{"\uE8BB"}</CloseButton>
+        <Button onClick={minimizeWindow}>{"\uE921"}</Button>
+        <Button onClick={maximizeWindow}>
+          {isMaximized ? "\uE923" : "\uE922"}
+        </Button>
+        <CloseButton onClick={closeWindow}>{"\uE8BB"}</CloseButton>
       </ButtonsContainer>
     </TitleBarContainer>
   );
