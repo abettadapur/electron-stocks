@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import bridge from "frontend/bridge";
 import {
   getEODHistoricalData,
   getIEXHistoricalData,
@@ -34,7 +35,7 @@ import {
 
 function createSocketChannel() {
   return eventChannel((emitter) => {
-    const unsubscribe = window.bridge.addEventListener(emitter);
+    const unsubscribe = bridge.addEventListener(emitter);
     return unsubscribe;
   });
 }
@@ -61,7 +62,7 @@ function* listenToSocket(channel) {
 
 export default function* StocksSaga() {
   let watchlist = yield call(loadWatchlist);
-  yield call(window.bridge.createSocket, watchlist);
+  yield call(bridge.createSocket, watchlist);
   const socketChannel = yield call(createSocketChannel);
   yield fork(listenToSocket, socketChannel);
   yield call(loadQuotes, watchlist);
@@ -108,7 +109,7 @@ function* saveWatchlist(
   yield call(loadIntradayQuote, action.payload.ticker);
 
   if (action && action.payload.ticker) {
-    yield call(window.bridge.addTicker, action.payload.ticker);
+    yield call(bridge.addTicker, action.payload.ticker);
   }
 }
 

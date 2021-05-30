@@ -3,7 +3,8 @@ var WebSocket = require("ws");
 var handlers = [];
 var SUBSCRIPTION_ID;
 var ws;
-window.bridge = {
+
+const bridge = {
   createSocket: function (initialTickers) {
     ws = new WebSocket("wss://api.tiingo.com/iex");
 
@@ -63,3 +64,8 @@ window.bridge = {
     }
   },
 };
+
+window.bridge = bridge;
+
+export type Bridge = typeof bridge;
+
