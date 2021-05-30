@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { connect } from "react-redux";
 import {
   StocksAwareState,
@@ -14,10 +14,12 @@ import {
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import Text from "../text/Text";
 import styled from "frontend/styled";
-import { MdStar, MdStarBorder } from "react-icons/md";
+import { MdStar, MdStarBorder, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import IconButton from "../button/IconButton";
 import { useTheme } from "../../theme/Theme";
 import { StocksActions } from "frontend/stocks/redux/stocks/StocksActions";
+import Button from "../button/Button";
+import TickerPeriodDetailsPane from "../TickerPeriodDetailsPane/TickerPeriodDetailsPane";
 
 type MappedProps = {
   selected: string;
@@ -43,6 +45,12 @@ const PctQuote = styled(Text)<{ gain: boolean }>((props) => ({
   marginLeft: 12,
 }));
 
+const TickerPeriodDetailsWrapper = styled(View)<{ show: boolean }>((props) => ({
+  overflow: 'hidden',
+  transition: "height linear 200ms",
+  height: props.show ? 100 : 0
+}));
+
 function StockDetails(props: Props) {
   let {
     selected,
@@ -53,6 +61,7 @@ function StockDetails(props: Props) {
     removeFromWatchlist,
   } = props;
   const theme = useTheme();
+  const [showDetails, setShowDetails] = useState<boolean>(false);
 
   const canToggleWatchlist = selected && lastQuote && !tickerInvalid;
 
@@ -100,7 +109,7 @@ function StockDetails(props: Props) {
               {Math.abs(
                 ((lastQuote.price - lastQuote.prevClose) /
                   lastQuote.prevClose) *
-                  100
+                100
               ).toFixed(2)}
               %)
             </PctQuote>
@@ -117,9 +126,22 @@ function StockDetails(props: Props) {
       </View>
       <View style={{ flex: 1, maxHeight: 500 }}>
         <HistoricalGraph />
-        <HistoricalPeriodButtons
-          periods={["1d", "5d", "1m", "6m", "ytd", "1y", "5y"]}
-        ></HistoricalPeriodButtons>
+        <View style={{ flexDirection: 'row' }}>
+          <div style={{ flex: 1 }}>
+            <HistoricalPeriodButtons
+              periods={["1d", "5d", "1m", "6m", "ytd", "1y", "5y"]}
+            ></HistoricalPeriodButtons>
+          </div>
+          <div>
+            <IconButton
+              icon={showDetails ? MdKeyboardArrowDown : MdKeyboardArrowUp}
+              size="medium"
+              onClick={() => setShowDetails(!showDetails)} />
+          </div>
+        </View>
+        <TickerPeriodDetailsWrapper show={showDetails}>
+          <TickerPeriodDetailsPane />
+        </TickerPeriodDetailsWrapper>
       </View>
     </View>
   );
