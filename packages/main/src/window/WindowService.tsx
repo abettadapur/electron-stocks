@@ -1,9 +1,19 @@
 import { BrowserWindow } from "electron";
 import path from "path";
 import { htmlDir } from "main/paths";
+import { ipcMain } from "electron";
 
 export class __WindowService {
-  private _windows = {};
+  private _windows: { [windowId: number]: BrowserWindow } = {};
+
+  constructor() {
+    ipcMain.on("window/close", this._onCloseWindow.bind(this));
+    ipcMain.on("window/minimize", this._onMinimizeWindow.bind(this));
+    ipcMain.on("window/maximize", this._onMaximizeWindow.bind(this));
+    ipcMain.on("window/unmaximize", this._onUnmaximizeWindow.bind(this));
+    ipcMain.on("window/isMaximized", this._isMaximized.bind(this));
+  }
+
   public createTasksWindow() {
     const win = new BrowserWindow({
       show: false,
@@ -44,6 +54,64 @@ export class __WindowService {
       win.show();
       win.webContents.openDevTools({ mode: "undocked", activate: true });
     });
+
+    win.on("maximize", () => {
+      win.webContents.send("window/onMaximize");
+    });
+
+    win.on("unmaximize", () => {
+      win.webContents.send("window/onUnmaximize");
+    });
+  }
+
+  private _onCloseWindow(event: Electron.IpcMainEvent): void {
+    const win = this._windows[event.sender.id];
+
+    if (!win) {
+      return;
+    }
+
+    win.close();
+  }
+
+  private _onMinimizeWindow(event: Electron.IpcMainEvent): void {
+    const win = this._windows[event.sender.id];
+
+    if (!win) {
+      return;
+    }
+
+    win.minimize();
+  }
+
+  private _onMaximizeWindow(event: Electron.IpcMainEvent): void {
+    const win = this._windows[event.sender.id];
+
+    if (!win) {
+      return;
+    }
+
+    win.maximize();
+  }
+
+  private _onUnmaximizeWindow(event: Electron.IpcMainEvent): void {
+    const win = this._windows[event.sender.id];
+
+    if (!win) {
+      return;
+    }
+
+    win.unmaximize();
+  }
+
+  private _isMaximized(event: Electron.IpcMainEvent): void {
+    const win = this._windows[event.sender.id];
+
+    if (!win) {
+      event.returnValue = false;
+    } else {
+      event.returnValue = win.isMaximized();
+    }
   }
 }
 

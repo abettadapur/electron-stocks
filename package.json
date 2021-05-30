@@ -32,6 +32,7 @@
     "@types/react-redux": "^7.1.9",
     "@types/request": "^2.48.5",
     "@types/webpack": "^4.41.18",
+    "@types/ws": "^7.4.4",
     "@typescript-eslint/eslint-plugin": "^2.10.0",
     "@typescript-eslint/parser": "^2.10.0",
     "babel-eslint": "^10.1.0",

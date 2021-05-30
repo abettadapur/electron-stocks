@@ -10,7 +10,7 @@
       "frontend/*": ["src/*"]
     }
   },
-  "references": [],
+  "references": [{"path": "../bridge"}],
   "include": ["src/**/*", "typings/**/*", "../../typings/**/*"],
   "exclude": ["node_modules"]
 }
