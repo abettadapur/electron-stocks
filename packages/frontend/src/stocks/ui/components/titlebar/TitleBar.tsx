@@ -11,6 +11,8 @@ const TitleBarContainer = styled(View)((props) => ({
   backgroundColor: props.theme.semanticColors.background,
   alignItems: "center",
   padding: "0px 0px 0px 8px",
+  "-webkit-user-select": "none",
+  "-webkit-app-region": "drag",
 }));
 
 const TitleContainer = styled(View)({

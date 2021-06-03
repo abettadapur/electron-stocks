@@ -16,8 +16,8 @@ function MenuBar(props: Props) {
   return (
     <Pivot
       pivotItems={[
-        { key: "stocks", title: "Stocks" },
-        { key: "finances", title: "My Finances" },
+        { key: "stocks", title: "Watchlist" },
+        { key: "finances", title: "My Portfolio" },
       ]}
       selectedKey={selected}
       onItemSelected={(key) => selectItem(key)}
