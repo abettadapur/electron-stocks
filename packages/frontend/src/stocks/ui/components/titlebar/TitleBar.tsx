@@ -42,6 +42,7 @@ const Button = styled.button((props) => ({
   ":hover": {
     backgroundColor: "rgba(255, 255, 255, 0.19)",
   },
+  "-webkit-app-region": "no-drag",
 }));
 
 const CloseButton = styled(Button)({
