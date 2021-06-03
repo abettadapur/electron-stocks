@@ -1,6 +1,7 @@
 import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import { StockMetadata } from "frontend/stocks/api/tiingo/models/StockMetadata";
 
 export type StocksState = {
   menuBar: {
@@ -8,6 +9,9 @@ export type StocksState = {
   };
   historicalData: {
     [ticker: string]: { [period in Period]: IEXHistorical[] | EODHistorical[] };
+  };
+  metadata: {
+    [ticker: string]: StockMetadata;
   };
   quotes: { [ticker: string]: IEXStockQuote };
   watchlist: Set<string>;

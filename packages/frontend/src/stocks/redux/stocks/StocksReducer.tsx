@@ -10,6 +10,7 @@ const StocksReducer = makeReducer(
     selectedPeriod: "1d" as Period,
     historicalData: {},
     quotes: {},
+    metadata: {},
     tickerInvalid: false,
   },
   (state: StocksState, action: StocksAction) => {
@@ -47,6 +48,11 @@ const StocksReducer = makeReducer(
 
       case StocksActions.quoteLoaded.type: {
         state.quotes[action.payload.ticker] = action.payload.quote;
+        break;
+      }
+
+      case StocksActions.metadataLoaded.type: {
+        state.metadata[action.payload.ticker] = action.payload.metadata;
         break;
       }
 

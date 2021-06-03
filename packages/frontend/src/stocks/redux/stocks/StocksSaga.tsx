@@ -4,6 +4,7 @@ import {
   getEODHistoricalData,
   getIEXHistoricalData,
   getIntradayQuote,
+  getStockMetadata,
 } from "frontend/stocks/api/tiingo";
 import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
@@ -12,7 +13,8 @@ import {
   SocketEvent,
   socketEventFromApiModel,
 } from "frontend/stocks/api/tiingo/models/SocketEvent";
-import { eventChannel } from "redux-saga";
+import { StockMetadata } from "frontend/stocks/api/tiingo/models/StockMetadata";
+import { eventChannel, SagaIterator } from "redux-saga";
 import {
   all,
   call,
@@ -27,6 +29,7 @@ import { Period } from "./Stocks.types";
 import { StocksAction, StocksActions } from "./StocksActions";
 import { HISTORICAL_PERIOD_INFO } from "./StocksConstants";
 import {
+  getMetadataForStock,
   getQuote,
   getSelectedPeriod,
   getSelectedTicker,
@@ -191,5 +194,27 @@ function* loadIntradayQuote(ticker: string) {
 }
 
 function* loadQuotes(tickers: string[]) {
-  yield all(tickers.map((ticker) => call(loadIntradayQuote, ticker)));
+  yield all(
+    tickers.map((ticker) =>
+      all([
+        call(loadIntradayQuote, ticker),
+        call(maybeLoadMetadataForTicker, ticker),
+      ])
+    )
+  );
+}
+
+function* maybeLoadMetadataForTicker(ticker: string): SagaIterator {
+  const metadata: StockMetadata | undefined = yield select(
+    getMetadataForStock,
+    ticker
+  );
+
+  if (metadata) {
+    return;
+  }
+
+  const stockMetadata = yield call(getStockMetadata, ticker);
+
+  yield put(StocksActions.metadataLoaded(ticker, stockMetadata));
 }

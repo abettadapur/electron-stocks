@@ -27,6 +27,10 @@ export function getSelectedHistoricalData(state: StocksAwareState) {
   ];
 }
 
+export function getMetadataForStock(state: StocksAwareState, ticker: string) {
+  return state.stocks.metadata[ticker];
+}
+
 export const selectIsSelectedTickerInWatchlist = createSelector(
   (s) => s.stocks.watchlist,
   getSelectedTicker,

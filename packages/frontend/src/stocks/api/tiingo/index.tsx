@@ -4,6 +4,10 @@ import { iexStockQuoteFromApiModel } from "./models/IEXStockQuote";
 import EODHistorical from "./models/EODHistorical";
 import { TiingoHistoricalPeriod } from "frontend/stocks/redux/stocks/Stocks.types";
 import IEXHistorical from "./models/IEXHistorical";
+import {
+  StockMetadata,
+  stockMetadataFromApiModel,
+} from "./models/StockMetadata";
 
 export async function getEODStockQuote(ticker: string) {
   const result = await makeApiRequest(`tiingo/daily/${ticker}/prices`);
@@ -54,4 +58,11 @@ export async function getIEXHistoricalData(
   });
   const historicalData = IEXHistorical.fromApiModelList(result);
   return historicalData;
+}
+
+export async function getStockMetadata(ticker: string): Promise<StockMetadata> {
+  const result = await makeApiRequest(`tiingo/daily/${ticker}`);
+
+  const metadata = stockMetadataFromApiModel(result);
+  return metadata;
 }

@@ -1,6 +1,7 @@
 import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
+import { StockMetadata } from "frontend/stocks/api/tiingo/models/StockMetadata";
 import { ActionsUnion, actionCreator } from "../utils/actionUtils";
 import { Period } from "./Stocks.types";
 
@@ -43,6 +44,10 @@ export const StocksActions = {
   quoteLoaded: actionCreator(
     "stocks/quoteLoaded" as const,
     (ticker: string, quote: IEXStockQuote) => ({ ticker, quote })
+  ),
+  metadataLoaded: actionCreator(
+    "stocks/metadataLoaded" as const,
+    (ticker: string, metadata: StockMetadata) => ({ ticker, metadata })
   ),
   historicalLoaded: actionCreator(
     "stocks/historicalLoaded" as const,

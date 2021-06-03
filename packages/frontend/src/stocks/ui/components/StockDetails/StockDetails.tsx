@@ -10,6 +10,7 @@ import HistoricalGraph, {
 } from "../HistoricalGraph/HistoricalGraph";
 import HistoricalPeriodButtons from "../HistoricalPeriodButtons/HistoricalPeriodButtons";
 import {
+  getMetadataForStock,
   getQuote,
   selectIsSelectedTickerInWatchlist,
 } from "frontend/stocks/redux/stocks/StocksSelectors";
@@ -25,16 +26,16 @@ import {
 import IconButton from "../button/IconButton";
 import { useTheme } from "../../theme/Theme";
 import { StocksActions } from "frontend/stocks/redux/stocks/StocksActions";
-import Button from "../button/Button";
 import TickerPeriodDetailsPane from "../TickerPeriodDetailsPane/TickerPeriodDetailsPane";
-import AnimatedNumber from "react-animated-numbers";
 import AnimatedDecimal from "../animatedDecimal/AnimatedDecimal";
+import { StockMetadata } from "frontend/stocks/api/tiingo/models/StockMetadata";
 
 type MappedProps = {
   selected: string;
   selectedPeriod: Period;
   isInWatchlist: boolean;
   lastQuote: IEXStockQuote | undefined;
+  metadata: StockMetadata | undefined;
   tickerInvalid: boolean;
 };
 
@@ -68,6 +69,7 @@ const TickerPeriodDetailsWrapper = styled(View)<{ show: boolean }>((props) => ({
 
 function StockDetails(props: Props) {
   let {
+    metadata,
     selected,
     isInWatchlist,
     lastQuote,
@@ -106,13 +108,14 @@ function StockDetails(props: Props) {
     return <div>Ticker Invalid</div>;
   }
 
-  if (!lastQuote || !selected) {
+  if (!lastQuote || !selected || !metadata) {
     return null;
   }
 
   return (
     <View style={{ flex: 1, padding: 8 }}>
       <Quote
+        companyName={metadata.name}
         isInWatchlist={isInWatchlist}
         lastQuote={lastQuote}
         historicalPriceInformation={historicalPriceInfo}
@@ -143,6 +146,7 @@ function StockDetails(props: Props) {
 }
 
 type QuoteProps = {
+  companyName: string;
   isInWatchlist: boolean;
   lastQuote: IEXStockQuote;
   historicalPriceInformation?: HistoricalPriceInformation;
@@ -151,6 +155,7 @@ type QuoteProps = {
 
 function Quote(props: QuoteProps) {
   const {
+    companyName,
     lastQuote,
     isInWatchlist,
     historicalPriceInformation,
@@ -192,7 +197,7 @@ function Quote(props: QuoteProps) {
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <View>
-        <Text textSize="medium">{lastQuote.symbol.toUpperCase()}</Text>
+        <Text textSize="medium">{companyName}</Text>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           {endPrice ? (
             <Text textSize="medium">{`${price.toFixed(2)} - ${endPrice.toFixed(
@@ -230,6 +235,7 @@ const mapStateToProps = (state: StocksAwareState): MappedProps => ({
   selected: state.stocks.selected,
   selectedPeriod: state.stocks.selectedPeriod,
   lastQuote: getQuote(state, state.stocks.selected),
+  metadata: getMetadataForStock(state, state.stocks.selected),
   isInWatchlist: selectIsSelectedTickerInWatchlist(state),
   tickerInvalid: state.stocks.tickerInvalid,
 });
