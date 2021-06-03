@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { connect } from "react-redux";
 import {
   StocksAwareState,
@@ -72,6 +72,8 @@ const TickerPeriodDetailsWrapper = styled(View)<{ show: boolean }>((props) => ({
   height: props.show ? 100 : 0,
 }));
 
+const DETAILS_THRESHOLD = 773;
+
 function StockDetails(props: Props) {
   let {
     metadata,
@@ -82,6 +84,9 @@ function StockDetails(props: Props) {
     addToWatchlist,
     removeFromWatchlist,
   } = props;
+  const [shouldHideDetails, setShouldHideDetails] = useState<boolean>(
+    window.innerHeight < DETAILS_THRESHOLD
+  );
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const [historicalPriceInfo, setHistoricalPriceInfo] =
     useState<HistoricalPriceInformation | undefined>();
@@ -89,6 +94,22 @@ function StockDetails(props: Props) {
   const onGraphHover = useCallback((priceInfo?: HistoricalPriceInformation) => {
     setHistoricalPriceInfo(priceInfo);
   }, []);
+
+  useEffect(() => {
+    const listener = () => {
+      if (shouldHideDetails && window.innerHeight >= DETAILS_THRESHOLD) {
+        setShouldHideDetails(false);
+      } else if (!shouldHideDetails && window.innerHeight < DETAILS_THRESHOLD) {
+        setShouldHideDetails(true);
+      }
+    };
+
+    window.addEventListener("resize", listener);
+
+    return () => {
+      window.removeEventListener("resize", listener);
+    };
+  }, [shouldHideDetails]);
 
   const canToggleWatchlist = selected && lastQuote && !tickerInvalid;
 
@@ -128,24 +149,30 @@ function StockDetails(props: Props) {
       />
       <View style={{ flex: 1, maxHeight: 500 }}>
         <HistoricalGraph onHover={onGraphHover} />
-        <View style={{ flexDirection: "row" }}>
-          <div style={{ flex: 1 }}>
-            <HistoricalPeriodButtons
-              periods={["1d", "5d", "1m", "6m", "ytd", "1y", "5y"]}
-            ></HistoricalPeriodButtons>
-          </div>
-          <div>
+      </View>
+      <View style={{ flexDirection: "row" }}>
+        <div style={{ flex: 1 }}>
+          <HistoricalPeriodButtons
+            periods={["1d", "5d", "1m", "6m", "ytd", "1y", "5y"]}
+          ></HistoricalPeriodButtons>
+        </div>
+        <div>
+          {shouldHideDetails && (
             <IconButton
               icon={showDetails ? MdKeyboardArrowDown : MdKeyboardArrowUp}
               size="medium"
               onClick={() => setShowDetails(!showDetails)}
             />
-          </div>
-        </View>
+          )}
+        </div>
+      </View>
+      {shouldHideDetails ? (
         <TickerPeriodDetailsWrapper show={showDetails}>
           <TickerPeriodDetailsPane />
         </TickerPeriodDetailsWrapper>
-      </View>
+      ) : (
+        <TickerPeriodDetailsPane />
+      )}
     </View>
   );
 }
