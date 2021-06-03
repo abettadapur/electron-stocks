@@ -189,19 +189,13 @@ function* loadHistoricalData(ticker: string, period: Period) {
 }
 
 function* loadIntradayQuote(ticker: string) {
+  yield fork(maybeLoadMetadataForTicker, ticker);
   const quote: IEXStockQuote = yield call(getIntradayQuote, ticker);
   yield put(StocksActions.quoteLoaded(ticker, quote));
 }
 
 function* loadQuotes(tickers: string[]) {
-  yield all(
-    tickers.map((ticker) =>
-      all([
-        call(loadIntradayQuote, ticker),
-        call(maybeLoadMetadataForTicker, ticker),
-      ])
-    )
-  );
+  yield all(tickers.map((ticker) => call(loadIntradayQuote, ticker)));
 }
 
 function* maybeLoadMetadataForTicker(ticker: string): SagaIterator {
