@@ -17,11 +17,25 @@ import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import { Theme, useTheme } from "../../theme/Theme";
 import throttle from "lodash.throttle";
 
-type Props = {
+export type HistoricalPriceInformation =
+  | { type: "quote"; price: number }
+  | {
+      type: "range";
+      begin: { price: number };
+      end: { price: number };
+    };
+
+type OwnProps = {
+  onHover: (priceInformation?: HistoricalPriceInformation) => void;
+};
+
+type MappedProps = {
   historicalData: IEXHistorical[] | EODHistorical[] | undefined;
   period: Period;
   lastQuote: IEXStockQuote;
 };
+
+type Props = MappedProps & OwnProps;
 
 type Point = { x: number; y: number };
 
@@ -31,7 +45,7 @@ const GraphCanvas = styled.canvas({
 });
 
 function HistoricalGraph(props: Props) {
-  let { historicalData, period, lastQuote } = props;
+  let { historicalData, period, lastQuote, onHover } = props;
   const [canvasDimensions, setCanvasDimensions] =
     useState<{ height: number; width: number } | null>(null);
   const mouseIntersectingRef = React.useRef(false);
@@ -70,10 +84,11 @@ function HistoricalGraph(props: Props) {
         mousePointRef.current,
         mouseClickPointRef.current,
         canvasRef,
-        theme
+        theme,
+        onHover
       );
     }
-  }, [historicalData, canvasDimensions]);
+  }, [historicalData, canvasDimensions, onHover]);
 
   function redraw() {
     requestAnimationFrame(() => {
@@ -85,7 +100,8 @@ function HistoricalGraph(props: Props) {
           mousePointRef.current,
           mouseClickPointRef.current,
           canvasRef,
-          theme
+          theme,
+          onHover
         );
       }
     });
@@ -118,6 +134,7 @@ function HistoricalGraph(props: Props) {
           mouseIntersectingRef.current = false;
           mousePointRef.current = null;
           redraw();
+          onHover(undefined);
         }}
         ref={canvasRef}
         style={{ border: "1px solid black" }}
@@ -126,7 +143,7 @@ function HistoricalGraph(props: Props) {
   );
 }
 
-const mapStateToProps = (state: StocksAwareState) => {
+const mapStateToProps = (state: StocksAwareState): MappedProps => {
   return {
     historicalData: getSelectedHistoricalData(state),
     period: state.stocks.selectedPeriod,
@@ -134,7 +151,7 @@ const mapStateToProps = (state: StocksAwareState) => {
   };
 };
 
-export default connect(mapStateToProps, null)(HistoricalGraph);
+export default connect(mapStateToProps, {})(HistoricalGraph);
 
 function drawGraph(
   data: IEXHistorical[] | EODHistorical[],
@@ -143,7 +160,8 @@ function drawGraph(
   mousePoint: Point | null,
   mouseClickPoint: Point | null,
   canvasRef: React.MutableRefObject<HTMLCanvasElement>,
-  theme: Theme
+  theme: Theme,
+  onHover: (priceInfo: HistoricalPriceInformation) => void
 ) {
   const { min, max } = getMinMaxOverPeriod(data);
   const periodInfo = HISTORICAL_PERIOD_INFO[selectedPeriod || "1d"];
@@ -310,27 +328,31 @@ function drawGraph(
 
       const beginPoint = data[beginIndex];
       const endPoint = data[endIndex];
-      const diff = endPoint.close - beginPoint.close;
-      const diffPct = (diff / beginPoint.close) * 100;
-      const gain = diff > 0;
+      onHover({
+        type: "range",
+        begin: { price: beginPoint.close },
+        end: { price: endPoint.close },
+      });
 
-      // Draw the price text
-      ctx.fillStyle = gain
-        ? theme.semanticColors.gain
-        : theme.semanticColors.loss;
-      ctx.font = "18px Segoe UI";
-      ctx.fillText(
-        `${gain ? "+" : "-"} ${Math.abs(diff).toFixed(2)} (${Math.abs(
-          diffPct
-        ).toFixed(2)}%)`,
-        canvasPoint.x + 4,
-        40
-      );
+      // // Draw the price text
+      // ctx.fillStyle = gain
+      //   ? theme.semanticColors.gain
+      //   : theme.semanticColors.loss;
+      // ctx.font = "18px Segoe UI";
+      // ctx.fillText(
+      //   `${gain ? "+" : "-"} ${Math.abs(diff).toFixed(2)} (${Math.abs(
+      //     diffPct
+      //   ).toFixed(2)}%)`,
+      //   canvasPoint.x + 4,
+      //   40
+      // );
     } else {
-      // Draw the price text
-      ctx.fillStyle = theme.semanticColors.textPrimary;
-      ctx.font = "18px Segoe UI";
-      ctx.fillText(`${point.close.toFixed(2)}`, canvasPoint.x + 4, 40);
+      onHover({ type: "quote", price: point.close });
+
+      // // Draw the price text
+      // ctx.fillStyle = theme.semanticColors.textPrimary;
+      // ctx.font = "18px Segoe UI";
+      // ctx.fillText(`${point.close.toFixed(2)}`, canvasPoint.x + 4, 40);
     }
   }
 

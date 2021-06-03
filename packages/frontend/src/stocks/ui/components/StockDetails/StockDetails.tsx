@@ -5,7 +5,9 @@ import {
   Period,
 } from "frontend/stocks/redux/stocks/Stocks.types";
 import View from "../../view/View";
-import HistoricalGraph from "../HistoricalGraph/HistoricalGraph";
+import HistoricalGraph, {
+  HistoricalPriceInformation,
+} from "../HistoricalGraph/HistoricalGraph";
 import HistoricalPeriodButtons from "../HistoricalPeriodButtons/HistoricalPeriodButtons";
 import {
   getQuote,
@@ -14,12 +16,19 @@ import {
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import Text from "../text/Text";
 import styled from "frontend/styled";
-import { MdStar, MdStarBorder, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
+import {
+  MdStar,
+  MdStarBorder,
+  MdKeyboardArrowDown,
+  MdKeyboardArrowUp,
+} from "react-icons/md";
 import IconButton from "../button/IconButton";
 import { useTheme } from "../../theme/Theme";
 import { StocksActions } from "frontend/stocks/redux/stocks/StocksActions";
 import Button from "../button/Button";
 import TickerPeriodDetailsPane from "../TickerPeriodDetailsPane/TickerPeriodDetailsPane";
+import AnimatedNumber from "react-animated-numbers";
+import AnimatedDecimal from "../animatedDecimal/AnimatedDecimal";
 
 type MappedProps = {
   selected: string;
@@ -45,10 +54,16 @@ const PctQuote = styled(Text)<{ gain: boolean }>((props) => ({
   marginLeft: 12,
 }));
 
+const PctQuoteSuffix = styled(Text)<{ gain: boolean }>((props) => ({
+  color: props.gain
+    ? props.theme.semanticColors.gain
+    : props.theme.semanticColors.loss,
+}));
+
 const TickerPeriodDetailsWrapper = styled(View)<{ show: boolean }>((props) => ({
-  overflow: 'hidden',
+  overflow: "hidden",
   transition: "height linear 200ms",
-  height: props.show ? 100 : 0
+  height: props.show ? 100 : 0,
 }));
 
 function StockDetails(props: Props) {
@@ -60,8 +75,13 @@ function StockDetails(props: Props) {
     addToWatchlist,
     removeFromWatchlist,
   } = props;
-  const theme = useTheme();
   const [showDetails, setShowDetails] = useState<boolean>(false);
+  const [historicalPriceInfo, setHistoricalPriceInfo] =
+    useState<HistoricalPriceInformation | undefined>();
+
+  const onGraphHover = useCallback((priceInfo?: HistoricalPriceInformation) => {
+    setHistoricalPriceInfo(priceInfo);
+  }, []);
 
   const canToggleWatchlist = selected && lastQuote && !tickerInvalid;
 
@@ -90,43 +110,17 @@ function StockDetails(props: Props) {
     return null;
   }
 
-  const gain = lastQuote.price - lastQuote.prevClose > 0;
-  const plusOrMinus = gain ? "+" : "-";
-
   return (
     <View style={{ flex: 1, padding: 8 }}>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <View>
-          <Text textSize="medium">{props.selected.toUpperCase()}</Text>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text textSize="medium">{lastQuote.price}</Text>
-            <PriceQuote textSize="medium" gain={gain}>
-              {plusOrMinus}
-              {Math.abs(lastQuote.price - lastQuote.prevClose).toFixed(2)}
-            </PriceQuote>
-            <PctQuote textSize="medium" gain={gain}>
-              ({plusOrMinus}
-              {Math.abs(
-                ((lastQuote.price - lastQuote.prevClose) /
-                  lastQuote.prevClose) *
-                100
-              ).toFixed(2)}
-              %)
-            </PctQuote>
-          </View>
-        </View>
-        <IconButton
-          icon={isInWatchlist ? MdStar : MdStarBorder}
-          iconColor={theme.colors.yellow_500}
-          size="medium"
-          transparent={true}
-          style={{ marginLeft: "auto" }}
-          onClick={toggleWatchlist}
-        />
-      </View>
+      <Quote
+        isInWatchlist={isInWatchlist}
+        lastQuote={lastQuote}
+        historicalPriceInformation={historicalPriceInfo}
+        toggleWatchlist={toggleWatchlist}
+      />
       <View style={{ flex: 1, maxHeight: 500 }}>
-        <HistoricalGraph />
-        <View style={{ flexDirection: 'row' }}>
+        <HistoricalGraph onHover={onGraphHover} />
+        <View style={{ flexDirection: "row" }}>
           <div style={{ flex: 1 }}>
             <HistoricalPeriodButtons
               periods={["1d", "5d", "1m", "6m", "ytd", "1y", "5y"]}
@@ -136,13 +130,98 @@ function StockDetails(props: Props) {
             <IconButton
               icon={showDetails ? MdKeyboardArrowDown : MdKeyboardArrowUp}
               size="medium"
-              onClick={() => setShowDetails(!showDetails)} />
+              onClick={() => setShowDetails(!showDetails)}
+            />
           </div>
         </View>
         <TickerPeriodDetailsWrapper show={showDetails}>
           <TickerPeriodDetailsPane />
         </TickerPeriodDetailsWrapper>
       </View>
+    </View>
+  );
+}
+
+type QuoteProps = {
+  isInWatchlist: boolean;
+  lastQuote: IEXStockQuote;
+  historicalPriceInformation?: HistoricalPriceInformation;
+  toggleWatchlist: () => void;
+};
+
+function Quote(props: QuoteProps) {
+  const {
+    lastQuote,
+    isInWatchlist,
+    historicalPriceInformation,
+    toggleWatchlist,
+  } = props;
+
+  let price: number;
+  let endPrice: number | undefined;
+  let priceDiff: number;
+  let pctDiff: number;
+
+  if (historicalPriceInformation) {
+    if (historicalPriceInformation.type === "quote") {
+      price = historicalPriceInformation.price;
+      priceDiff = historicalPriceInformation.price - lastQuote.prevClose;
+      pctDiff =
+        ((historicalPriceInformation.price - lastQuote.prevClose) /
+          lastQuote.prevClose) *
+        100;
+    } else {
+      price = historicalPriceInformation.begin.price;
+      endPrice = historicalPriceInformation.end.price;
+      priceDiff =
+        historicalPriceInformation.end.price -
+        historicalPriceInformation.begin.price;
+      pctDiff = (priceDiff / historicalPriceInformation.begin.price) * 100;
+    }
+  } else {
+    price = lastQuote.price;
+    priceDiff = lastQuote.price - lastQuote.prevClose;
+    pctDiff =
+      ((lastQuote.price - lastQuote.prevClose) / lastQuote.prevClose) * 100;
+  }
+
+  const gain = priceDiff > 0;
+  const plusOrMinus = gain ? "+" : "-";
+  const theme = useTheme();
+
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View>
+        <Text textSize="medium">{lastQuote.symbol.toUpperCase()}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          {endPrice ? (
+            <Text textSize="medium">{`${price.toFixed(2)} - ${endPrice.toFixed(
+              2
+            )}`}</Text>
+          ) : (
+            <AnimatedDecimal value={price} />
+          )}
+          <PriceQuote textSize="medium" gain={gain}>
+            {plusOrMinus}
+          </PriceQuote>
+          <AnimatedDecimal value={Math.abs(priceDiff)} gain={gain} />
+          <PctQuote textSize="medium" gain={gain}>
+            ({plusOrMinus}
+          </PctQuote>
+          <AnimatedDecimal value={Math.abs(pctDiff)} gain={gain} />
+          <PctQuoteSuffix gain={gain} textSize="medium">
+            %)
+          </PctQuoteSuffix>
+        </View>
+      </View>
+      <IconButton
+        icon={isInWatchlist ? MdStar : MdStarBorder}
+        iconColor={theme.colors.yellow_500}
+        size="medium"
+        transparent={true}
+        style={{ marginLeft: "auto" }}
+        onClick={toggleWatchlist}
+      />
     </View>
   );
 }

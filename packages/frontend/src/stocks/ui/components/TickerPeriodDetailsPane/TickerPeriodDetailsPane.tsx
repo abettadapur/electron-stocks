@@ -1,23 +1,23 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { StocksAwareState } from 'frontend/stocks/redux/stocks/Stocks.types';
-import View from '../../view/View';
-import { getQuote } from 'frontend/stocks/redux/stocks/StocksSelectors';
-import { IEXStockQuote } from 'frontend/stocks/api/tiingo/models/IEXStockQuote';
+import React from "react";
+import { connect } from "react-redux";
+import { StocksAwareState } from "frontend/stocks/redux/stocks/Stocks.types";
+import View from "../../view/View";
+import { getQuote } from "frontend/stocks/redux/stocks/StocksSelectors";
+import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import Text from "../text/Text";
 import styled from "frontend/styled";
 
 interface Props {
-  lastQuote: IEXStockQuote
+  lastQuote: IEXStockQuote;
 }
 
 const Column = styled(View)({
-  flex: 1
+  flex: 1,
 });
 
 const DetailsWrapper = styled(View)({
-  flexDirection: 'row',
-  padding: 10
+  flexDirection: "row",
+  padding: 10,
 });
 
 const CellContainer = styled(View)((props) => ({
@@ -41,13 +41,13 @@ function TickerPeriodDetailsPane(props: Props) {
         </Column>
       </DetailsWrapper>
     </CellContainer>
-  )
+  );
 }
 
 function mapStateToProps(state: StocksAwareState) {
   return {
-    lastQuote: getQuote(state, state.stocks.selected)
-  }
+    lastQuote: getQuote(state, state.stocks.selected),
+  };
 }
 
-export default connect(mapStateToProps, null)(TickerPeriodDetailsPane);
+export default connect(mapStateToProps, {})(TickerPeriodDetailsPane);
