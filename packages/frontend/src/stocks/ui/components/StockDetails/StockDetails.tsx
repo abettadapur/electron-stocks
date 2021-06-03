@@ -61,6 +61,11 @@ const PctQuoteSuffix = styled(Text)<{ gain: boolean }>((props) => ({
     : props.theme.semanticColors.loss,
 }));
 
+const ExchangeTicker = styled(Text)((props) => ({
+  color: props.theme.semanticColors.textBackground,
+  marginLeft: "auto",
+}));
+
 const TickerPeriodDetailsWrapper = styled(View)<{ show: boolean }>((props) => ({
   overflow: "hidden",
   transition: "height linear 200ms",
@@ -115,7 +120,7 @@ function StockDetails(props: Props) {
   return (
     <View style={{ flex: 1, padding: 8 }}>
       <Quote
-        companyName={metadata.name}
+        metadata={metadata}
         isInWatchlist={isInWatchlist}
         lastQuote={lastQuote}
         historicalPriceInformation={historicalPriceInfo}
@@ -146,7 +151,7 @@ function StockDetails(props: Props) {
 }
 
 type QuoteProps = {
-  companyName: string;
+  metadata: StockMetadata;
   isInWatchlist: boolean;
   lastQuote: IEXStockQuote;
   historicalPriceInformation?: HistoricalPriceInformation;
@@ -155,7 +160,7 @@ type QuoteProps = {
 
 function Quote(props: QuoteProps) {
   const {
-    companyName,
+    metadata,
     lastQuote,
     isInWatchlist,
     historicalPriceInformation,
@@ -195,38 +200,39 @@ function Quote(props: QuoteProps) {
   const theme = useTheme();
 
   return (
-    <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <View>
-        <Text textSize="medium">{companyName}</Text>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          {endPrice ? (
-            <Text textSize="medium">{`${price.toFixed(2)} - ${endPrice.toFixed(
-              2
-            )}`}</Text>
-          ) : (
-            <AnimatedDecimal value={price} />
-          )}
-          <PriceQuote textSize="medium" gain={gain}>
-            {plusOrMinus}
-          </PriceQuote>
-          <AnimatedDecimal value={Math.abs(priceDiff)} gain={gain} />
-          <PctQuote textSize="medium" gain={gain}>
-            ({plusOrMinus}
-          </PctQuote>
-          <AnimatedDecimal value={Math.abs(pctDiff)} gain={gain} />
-          <PctQuoteSuffix gain={gain} textSize="medium">
-            %)
-          </PctQuoteSuffix>
-        </View>
+    <View>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <Text textSize="large">{metadata.name}</Text>
+        <ExchangeTicker textSize="large">{`${metadata.exchange}:${metadata.symbol}`}</ExchangeTicker>
       </View>
-      <IconButton
-        icon={isInWatchlist ? MdStar : MdStarBorder}
-        iconColor={theme.colors.yellow_500}
-        size="medium"
-        transparent={true}
-        style={{ marginLeft: "auto" }}
-        onClick={toggleWatchlist}
-      />
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        {endPrice ? (
+          <Text textSize="medium">{`${price.toFixed(2)} - ${endPrice.toFixed(
+            2
+          )}`}</Text>
+        ) : (
+          <AnimatedDecimal value={price} />
+        )}
+        <PriceQuote textSize="medium" gain={gain}>
+          {plusOrMinus}
+        </PriceQuote>
+        <AnimatedDecimal value={Math.abs(priceDiff)} gain={gain} />
+        <PctQuote textSize="medium" gain={gain}>
+          ({plusOrMinus}
+        </PctQuote>
+        <AnimatedDecimal value={Math.abs(pctDiff)} gain={gain} />
+        <PctQuoteSuffix gain={gain} textSize="medium">
+          %)
+        </PctQuoteSuffix>
+        <IconButton
+          icon={isInWatchlist ? MdStar : MdStarBorder}
+          iconColor={theme.colors.yellow_500}
+          size="medium"
+          transparent={true}
+          style={{ marginLeft: "auto" }}
+          onClick={toggleWatchlist}
+        />
+      </View>
     </View>
   );
 }

@@ -280,6 +280,7 @@ export type Theme = {
     surface: string;
     surfaceSelected: string;
     textPrimary: string;
+    textBackground: string;
     primary: string;
     secondary: string;
     dividers: string;
@@ -299,6 +300,7 @@ const defaultTheme: Theme = {
     surface: materialColors.grey_400,
     surfaceSelected: materialColors.light_blue_200,
     textPrimary: materialColors.black,
+    textBackground: materialColors.grey_500,
     primary: materialColors.blue_600,
     secondary: materialColors.green_600,
     dividers: materialColors.blue_grey_600,
@@ -314,6 +316,7 @@ const darkTheme: Theme = {
     surface: materialColors.grey_800,
     surfaceSelected: materialColors.blue_300,
     textPrimary: materialColors.white,
+    textBackground: materialColors.grey_500,
     primary: materialColors.blue_600,
     secondary: materialColors.green_600,
     dividers: materialColors.blue_grey_600,
