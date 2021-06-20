@@ -87,6 +87,17 @@ const StocksReducer = makeReducer(
           }
           state.quotes[action.payload.ticker].price = action.payload.lastPrice;
         }
+        break;
+      }
+
+      case StocksActions.openModal.type: {
+        state.activeModal = action.payload.modal;
+        break;
+      }
+
+      case StocksActions.closeModal.type: {
+        state.activeModal = '';
+        break;
       }
     }
   }

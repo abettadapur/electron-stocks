@@ -73,6 +73,15 @@ export const StocksActions = {
       lastPrice,
     })
   ),
+  openModal: actionCreator(
+    "stocks/openModal" as const,
+    (modal: string) => ({
+      modal
+    })
+  ),
+  closeModal: actionCreator(
+    "stocks/closeModal" as const
+  )
 };
 
 export type StocksAction = ActionsUnion<typeof StocksActions>;

@@ -18,6 +18,7 @@ export type StocksState = {
   selected: string;
   selectedPeriod: Period;
   tickerInvalid: boolean;
+  activeModal?: string;
 };
 
 export type StocksAwareState = {

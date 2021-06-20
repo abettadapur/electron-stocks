@@ -12,6 +12,7 @@ import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import { getQuotes } from "frontend/stocks/redux/stocks/StocksSelectors";
 import WatchlistCell from "./WatchListCell";
 import SearchBar from "../SearchBar/SearchBar";
+import Collapsible from '../Collapsible/Collapsible';
 
 type MappedProps = {
   selectedTicker: string;
@@ -72,20 +73,22 @@ function Watchlist(props: Props) {
         <SearchBar />
       </SearchBarContainer>
       <ScrollView>
-        {watchlist.map((w, i) => (
-          <View
-            key={i}
-            onClick={() => setSelectedStock(w)}
-            style={{ marginTop: i !== 0 ? 12 : undefined }}
-          >
-            <WatchlistCell
-              ticker={w}
-              selected={w === selectedTicker}
-              quote={quotes[w.toLowerCase()]}
-              onRemoveClicked={onRemoveTicker}
-            />
-          </View>
-        ))}
+        <Collapsible text={"Watchlist"}>
+          {watchlist.map((w, i) => (
+            <View
+              key={i}
+              onClick={() => setSelectedStock(w)}
+              style={{ marginTop: i !== 0 ? 12 : undefined }}
+            >
+              <WatchlistCell
+                ticker={w}
+                selected={w === selectedTicker}
+                quote={quotes[w.toLowerCase()]}
+                onRemoveClicked={onRemoveTicker}
+              />
+            </View>
+          ))}
+        </Collapsible>
       </ScrollView>
     </WatchlistContainer>
   );

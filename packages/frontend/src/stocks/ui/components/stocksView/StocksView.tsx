@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "../../../../styled";
 import View from "../../view/View";
-import Watchlist from "../watchlist/Watchlist";
+import FavoritedStocks from "../FavoritedStocks/FavoritedStocks";
 import StockDetails from "../StockDetails/StockDetails";
-import SearchBar from "../SearchBar/SearchBar";
+import ModalContainer from "../ModalContainer/ModalContainer";
 
 const StocksViewContainer = styled(View)({
   flexDirection: "row",
@@ -21,8 +21,9 @@ const RightContainer = styled(View)({
 export default function StocksView() {
   return (
     <StocksViewContainer>
+      <ModalContainer></ModalContainer>
       <LeftContainer>
-        <Watchlist></Watchlist>
+        <FavoritedStocks></FavoritedStocks>
       </LeftContainer>
       <RightContainer>
         <StockDetails></StockDetails>
