@@ -15,12 +15,11 @@ type Props = {
 function ModalContainer(props: Props & typeof Actions) {
   const ModalWrapper = styled.div<{ modal?: string }>((props) => ({
     display: props.modal ? 'block' : 'none',
-    position: 'absolute',
+    position: 'fixed',
     zIndex: 100,
-    backgroundColor: 'gray',
+    backgroundColor: props.theme.colors.grey_700,
     top: '25%',
     left: '25%',
-    width: '50%',
     height: '50%',
     borderRadius: 10
   }));
@@ -39,8 +38,12 @@ function ModalContainer(props: Props & typeof Actions) {
   });
 
   const ModalContent = styled.div({
-    padding: 10
+    padding: '0px 5px 0px 5px'
   });
+
+  const Line = styled.hr((props) => ({
+    borderColor: props.theme.colors.grey_500
+  }))
 
   const { modal, closeModal } = props;
 
@@ -58,7 +61,7 @@ function ModalContainer(props: Props & typeof Actions) {
           />
         </CloseWrapper>
       </TitleBar>
-      <hr />
+      <Line />
       <ModalContent>
         {
           modal &&

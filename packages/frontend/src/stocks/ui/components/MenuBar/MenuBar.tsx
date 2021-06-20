@@ -1,36 +1,29 @@
 import React from "react";
 import { connect } from "react-redux";
-import { StocksAwareState } from "../../../redux/stocks/Stocks.types";
-import Pivot from "../../pivot/Pivot";
 import { StocksActions } from "frontend/stocks/redux/stocks/StocksActions";
+import Button from "../button/Button";
+import PrimaryButton from "../button/PrimaryButton";
+import styled from 'frontend/styled';
 
-type MappedProps = {
-  selected: string;
-};
+function MenuBar(props: typeof Actions) {
+  const { openModal } = props;
 
-type Props = MappedProps & typeof Actions;
-
-function MenuBar(props: Props) {
-  const { selectItem, selected } = props;
+  const ButtonWrapper = styled.div({
+    marginLeft: 'auto',
+    padding: 5
+  });
 
   return (
-    <Pivot
-      pivotItems={[
-        { key: "stocks", title: "Watchlist" },
-        { key: "finances", title: "My Portfolio" },
-      ]}
-      selectedKey={selected}
-      onItemSelected={(key) => selectItem(key)}
-    />
+    <ButtonWrapper>
+      <PrimaryButton onClick={() => openModal("AddTransactionModal")} size={"small"}>
+        Add Transaction
+      </PrimaryButton>
+    </ButtonWrapper>
   );
 }
 
-const mapStateToProps = (state: StocksAwareState): MappedProps => ({
-  selected: state.stocks.menuBar.menuItem,
-});
-
 const Actions = {
-  selectItem: StocksActions.menuSelect,
-};
+  openModal: StocksActions.openModal
+}
 
-export default connect(mapStateToProps, Actions)(MenuBar);
+export default connect(null, Actions)(MenuBar);

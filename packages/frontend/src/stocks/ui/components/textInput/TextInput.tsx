@@ -48,6 +48,7 @@ type Props = {
   rightIconProps?: {
     icon: IconType;
     color?: string;
+    onClick?: () => void;
   };
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
@@ -64,6 +65,7 @@ export default React.forwardRef<HTMLInputElement | null, Props>(
                 icon={rightIconProps.icon}
                 size="small"
                 style={{ color: rightIconProps.color }}
+                onClick={rightIconProps.onClick}
               />
             </IconContainer>
           )}

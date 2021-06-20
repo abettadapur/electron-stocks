@@ -7,6 +7,7 @@ type Props = {
   size: "small" | "medium" | "large";
   className?: string;
   style?: React.CSSProperties;
+  onClick?: () => void;
 };
 
 const sizes = {
@@ -26,6 +27,7 @@ export default function Icon(props: Props) {
       fontSize={sizes[size]}
       className={className}
       style={style}
+      onClick={props.onClick}
     />
   );
 }
