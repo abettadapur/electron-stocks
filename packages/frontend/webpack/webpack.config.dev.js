@@ -19,7 +19,7 @@ function generateDevelopmentConfig() {
     devtool: "cheap-module-eval-source-map",
     output: {
       filename: "[name].bundle.js",
-      publicPath: "http://localhost:9000/",
+      publicPath: "http://localhost:9999/",
     },
     externals: {
       "electron-fetch": "electron-fetch", // Exclude this bundle from any renderer process code

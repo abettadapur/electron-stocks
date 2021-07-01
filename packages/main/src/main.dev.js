@@ -56,7 +56,7 @@ async function init() {
   startApplication();
 }
 function startWebpackServer() {
-  const port = 9000;
+  const port = 9999;
   const webpack = require("webpack");
   const webpackDevServer = require("webpack-dev-server");
   const generateDevelopmentConfig = require("../../frontend/webpack/webpack.config.dev");
@@ -68,7 +68,7 @@ function startWebpackServer() {
     stats: "errors-only",
     noInfo: true,
     clientLogLevel: "none",
-    publicPath: "http://localhost:9000/",
+    publicPath: "http://localhost:9999/",
     historyApiFallback: true,
   };
   webpackDevServer.addDevServerEntrypoints(config, options);
@@ -76,6 +76,6 @@ function startWebpackServer() {
   const server = new webpackDevServer(compiler, options);
   server.listen(port, "localhost", () => {
     // eslint-disable-next-line no-console
-    console.log("dev server listening on port 9000");
+    console.log("dev server listening on port 9999");
   });
 }

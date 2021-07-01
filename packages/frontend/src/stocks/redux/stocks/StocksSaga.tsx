@@ -46,7 +46,8 @@ function createSocketChannel() {
 function* listenToSocket(channel) {
   while (true) {
     const event = yield take(channel);
-    const socketEvent: SocketEvent = socketEventFromApiModel(JSON.parse(event));
+    const socketEvent: SocketEvent = socketEventFromApiModel(event);
+    console.dir(socketEvent);
     if (
       socketEvent.data &&
       (socketEvent.data.updateMessageType === "T" ||

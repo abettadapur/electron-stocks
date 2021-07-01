@@ -13,7 +13,7 @@ function getEntryConfig(includeDevScripts) {
   if (includeDevScripts) {
     entryPoints.forEach((entry) => {
       entryConfig[entry] = [
-        "webpack-dev-server/client?http://localhost:9000",
+        "webpack-dev-server/client?http://localhost:9999",
         "webpack/hot/only-dev-server",
         "./packages/frontend/src/beforeEntry.tsx",
         `./packages/frontend/src/entry/${entry}.tsx`,

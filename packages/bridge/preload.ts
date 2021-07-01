@@ -2,9 +2,9 @@ import WebSocket from "ws";
 import { ipcRenderer } from "electron";
 import os from "os";
 
-let handlers: ((data: string, flags: string[]) => void)[] = [];
-// var SUBSCRIPTION_ID;
+let handlers: ((data: object, flags: string[]) => void)[] = [];
 let ws: WebSocket;
+let subscriptionID: string | undefined;
 
 let maximizeListeners: (() => void)[] = [];
 let unmaximizeListeners: (() => void)[] = [];
@@ -35,12 +35,22 @@ const bridge = {
     });
 
     ws.on("message", function (data: string, flags: string[]) {
-      handlers.forEach((h) => {
-        h(data, flags);
-      });
+      try {
+        const parsedData = JSON.parse(data);
+        if (parsedData.messageType === "I") {
+          // Save subscription ID
+          subscriptionID = parsedData.data.subscriptionId;
+          console.log("Saved subscription", subscriptionID);
+        }
+        handlers.forEach((h) => {
+          h(parsedData, flags);
+        });
+      } catch (e) {
+        console.error("Could not parse websocket message");
+      }
     });
   },
-  addEventListener: function (f: (data: string, flags: string[]) => void) {
+  addEventListener: function (f: (data: object, flags: string[]) => void) {
     if (f) {
       handlers.push(f);
     }
@@ -54,7 +64,7 @@ const bridge = {
       authorization: "f3868f7ec3aae26d831fc2777efe8a6717135b61",
       eventData: {
         thresholdLevel: 0,
-        //'subscriptionId': SUBSCRIPTION_ID,
+        subscriptionId: subscriptionID,
         tickers: [ticker],
       },
     };
@@ -68,7 +78,7 @@ const bridge = {
       authorization: "f3868f7ec3aae26d831fc2777efe8a6717135b61",
       eventData: {
         thresholdLevel: 0,
-        //'subscriptionId': SUBSCRIPTION_ID,
+        subscriptionId: subscriptionID,
         tickers: tickers,
       },
     };

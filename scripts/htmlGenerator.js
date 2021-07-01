@@ -43,7 +43,7 @@ function generateDevelopmentHtml() {
       devEntry: entryFile,
       splash: false,
       dev: true,
-      host: "http://localhost:9000",
+      host: "http://localhost:9999",
     });
     fs.writeFileSync(path.join(outputDirectory, `${entryFile}.html`), output);
   }
