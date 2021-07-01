@@ -27,7 +27,7 @@ const globalStyles = {
     margin: 0,
     display: "flex",
     flexDirection: "column",
-    fontFamily: "Segoe UI",
+    fontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI",
     overflow: "hidden",
     userSelect: "none",
     cursor: "default",

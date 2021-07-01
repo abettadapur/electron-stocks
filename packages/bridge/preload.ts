@@ -1,5 +1,6 @@
 import WebSocket from "ws";
 import { ipcRenderer } from "electron";
+import os from "os";
 
 let handlers: ((data: string, flags: string[]) => void)[] = [];
 // var SUBSCRIPTION_ID;
@@ -105,6 +106,11 @@ const bridge = {
       return () => {
         unmaximizeListeners = unmaximizeListeners.filter((l) => l !== listener);
       };
+    },
+  },
+  platform: {
+    os() {
+      return os.platform();
     },
   },
 };

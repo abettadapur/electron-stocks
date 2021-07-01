@@ -2,6 +2,7 @@ import { BrowserWindow } from "electron";
 import path from "path";
 import { htmlDir } from "main/paths";
 import { ipcMain } from "electron";
+import os from "os";
 
 export class __WindowService {
   private _windows: { [windowId: number]: BrowserWindow } = {};
@@ -19,6 +20,7 @@ export class __WindowService {
       show: false,
       resizable: true, // Have this on by default, so Windows OS snaps correctly (https://github.com/electron/electron/issues/11568)
       frame: false,
+      titleBarStyle: os.platform() === "darwin" ? "hidden" : undefined,
       webPreferences: {
         nativeWindowOpen: true,
         preload: path.resolve(

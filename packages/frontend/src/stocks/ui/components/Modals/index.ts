@@ -1,5 +1,7 @@
-import { AddTransactionModal } from './AddTransactionModal'
+import { AddTransactionModal } from "./AddTransactionModal";
 
-export default {
+const Modals = {
   AddTransactionModal,
-}
+};
+export type ModalType = keyof typeof Modals;
+export default Modals;

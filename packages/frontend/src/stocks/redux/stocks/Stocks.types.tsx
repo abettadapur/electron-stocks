@@ -2,6 +2,7 @@ import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import { StockMetadata } from "frontend/stocks/api/tiingo/models/StockMetadata";
+import { ModalType } from "frontend/stocks/ui/components/Modals";
 
 export type StocksState = {
   menuBar: {
@@ -18,7 +19,7 @@ export type StocksState = {
   selected: string;
   selectedPeriod: Period;
   tickerInvalid: boolean;
-  activeModal?: string;
+  activeModal: ModalType | null;
 };
 
 export type StocksAwareState = {

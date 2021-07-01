@@ -78,6 +78,10 @@ export default function TitleBar() {
     bridge.window.minimize();
   }, []);
 
+  if (bridge.platform.os() === "darwin") {
+    return null;
+  }
+
   return (
     <TitleBarContainer>
       <TitleContainer>

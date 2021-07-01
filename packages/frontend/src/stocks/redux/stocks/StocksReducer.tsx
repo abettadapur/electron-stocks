@@ -12,6 +12,7 @@ const StocksReducer = makeReducer(
     quotes: {},
     metadata: {},
     tickerInvalid: false,
+    activeModal: null,
   },
   (state: StocksState, action: StocksAction) => {
     switch (action.type) {
@@ -96,7 +97,7 @@ const StocksReducer = makeReducer(
       }
 
       case StocksActions.closeModal.type: {
-        state.activeModal = '';
+        state.activeModal = null;
         break;
       }
     }

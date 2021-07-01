@@ -2,6 +2,7 @@ import EODHistorical from "frontend/stocks/api/tiingo/models/EODHistorical";
 import IEXHistorical from "frontend/stocks/api/tiingo/models/IEXHistorical";
 import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import { StockMetadata } from "frontend/stocks/api/tiingo/models/StockMetadata";
+import { ModalType } from "frontend/stocks/ui/components/Modals";
 import { ActionsUnion, actionCreator } from "../utils/actionUtils";
 import { Period } from "./Stocks.types";
 
@@ -73,15 +74,10 @@ export const StocksActions = {
       lastPrice,
     })
   ),
-  openModal: actionCreator(
-    "stocks/openModal" as const,
-    (modal: string) => ({
-      modal
-    })
-  ),
-  closeModal: actionCreator(
-    "stocks/closeModal" as const
-  )
+  openModal: actionCreator("stocks/openModal" as const, (modal: ModalType) => ({
+    modal,
+  })),
+  closeModal: actionCreator("stocks/closeModal" as const),
 };
 
 export type StocksAction = ActionsUnion<typeof StocksActions>;
