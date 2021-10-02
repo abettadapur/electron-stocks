@@ -3,6 +3,7 @@ import styled from "frontend/styled";
 import View from "../../view/View";
 import Text from "../text/Text";
 import bridge from "frontend/bridge";
+import MacTitleBar from "./MacTitleBar";
 
 const TitleBarContainer = styled(View)((props) => ({
   height: 30,
@@ -79,7 +80,7 @@ export default function TitleBar() {
   }, []);
 
   if (bridge.platform.os() === "darwin") {
-    return null;
+    return <MacTitleBar/>;
   }
 
   return (

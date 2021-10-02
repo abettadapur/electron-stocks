@@ -14,9 +14,17 @@ const entryDirectory = path.join(
 /**
  * Return handlebar template
  */
-function getTemplate() {
+function getDevTemplate() {
   return ejs.compile(
     fs.readFileSync(path.join(__dirname, "htmlTemplate.html.ejs")).toString()
+  );
+}
+
+function getProdTemplate() {
+  return ejs.compile(
+    fs
+      .readFileSync(path.join(__dirname, "prodHtmlTemplate.html.ejs"))
+      .toString()
   );
 }
 
@@ -39,7 +47,7 @@ function generateDevelopmentHtml() {
 
   const entryFiles = getEntryPoints();
   for (const entryFile of entryFiles) {
-    const output = getTemplate()({
+    const output = getDevTemplate()({
       devEntry: entryFile,
       splash: false,
       dev: true,
@@ -68,7 +76,26 @@ function getJsFiles(directory, extension) {
   return files;
 }
 
+function generateProductionHtml() {
+  const outputDirectory = path.join(__dirname, "..", "build");
+
+  if (!fs.existsSync(outputDirectory)) {
+    fs.mkdirSync(outputDirectory);
+  }
+
+  const entryFiles = getEntryPoints();
+
+  for (const entryFile of entryFiles) {
+    const output = getProdTemplate()({
+      entry: entryFile,
+      splash: false,
+    });
+    fs.writeFileSync(path.join(outputDirectory, `${entryFile}.html`), output);
+  }
+}
+
 module.exports = {
   getEntryPoints,
   generateDevelopmentHtml,
+  generateProductionHtml,
 };

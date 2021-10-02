@@ -30,35 +30,6 @@ const moduleLoaders = () => {
             },
           ],
         },
-        // {
-        //   test: /\.svg$/,
-        //   exclude: /\.static\.svg$/,
-        //   use: [
-        //     {
-        //       loader: 'cache-loader',
-        //       options: {
-        //         cacheIdentifier,
-        //       },
-        //     },
-        //     {
-        //       loader: 'babel-loader',
-        //       options: {
-        //         plugins,
-        //         rootMode: 'upward',
-        //       },
-        //     },
-        //     {
-        //       loader: path.join(
-        //         __dirname,
-        //         '..',
-        //         '..',
-        //         '..',
-        //         'scripts',
-        //         'archonSvgLoader.js',
-        //       ),
-        //     },
-        //   ],
-        // },
         {
           test: /\.((static\.svg)|png|woff2|ttf)$/,
           use: [

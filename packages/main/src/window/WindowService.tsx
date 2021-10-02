@@ -1,8 +1,9 @@
 import { BrowserWindow } from "electron";
 import path from "path";
-import { htmlDir } from "main/paths";
+import { htmlDir, preload } from "main/paths";
 import { ipcMain } from "electron";
 import os from "os";
+import { isProduction } from "main/appConfig";
 
 export class __WindowService {
   private _windows: { [windowId: number]: BrowserWindow } = {};
@@ -13,6 +14,9 @@ export class __WindowService {
     ipcMain.on("window/maximize", this._onMaximizeWindow.bind(this));
     ipcMain.on("window/unmaximize", this._onUnmaximizeWindow.bind(this));
     ipcMain.on("window/isMaximized", this._isMaximized.bind(this));
+
+    console.log("HTML", htmlDir);
+    console.log("PRELOAD", preload);
   }
 
   public createTasksWindow() {
@@ -23,14 +27,7 @@ export class __WindowService {
       titleBarStyle: os.platform() === "darwin" ? "hidden" : undefined,
       webPreferences: {
         nativeWindowOpen: true,
-        preload: path.resolve(
-          __dirname,
-          "..",
-          "..",
-          "..",
-          "bridge",
-          "preload.dev.js"
-        ),
+        preload: preload,
         //   !makeSecure || !isPortalWindow ? this._getPreloadFile() : undefined,
         // We can't set the __bridge on window from preload unless this option is on
         contextIsolation: false,
@@ -54,7 +51,9 @@ export class __WindowService {
 
     win.on("ready-to-show", () => {
       win.show();
-      win.webContents.openDevTools({ mode: "undocked", activate: true });
+      if (!isProduction()) {
+        win.webContents.openDevTools({ mode: "undocked", activate: true });
+      }
     });
 
     win.on("maximize", () => {

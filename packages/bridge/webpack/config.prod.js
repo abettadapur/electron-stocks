@@ -9,13 +9,13 @@ const path = require("path");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 
 function generateProductionConfig() {
-  console.log("INPUT", path.join(__dirname, "..", "src", "main.js"));
+  console.log("INPUT", path.join(__dirname, "..", "preload.ts"));
   console.log("OUTPUT", path.resolve(__dirname, "..", "..", "build"));
   return {
     mode: "production",
     target: "electron-main",
     entry: {
-      main: path.join(__dirname, "..", "src", "main.js"),
+      preload: path.join(__dirname, "..", "preload.ts"),
     },
     // See https://webpack.js.org/configuration/devtool/ for the devtool options
     // This is the best option for development because it provides high fidelity sourcemaps
@@ -25,10 +25,10 @@ function generateProductionConfig() {
       path: path.resolve(__dirname, "..", "..", "..", "build"),
       filename: "[name].bundle.js",
     },
-    resolve: { extensions: [".js", ".ts", ".tsx", ".json"] },
     node: {
       __dirname: false,
     },
+    resolve: { extensions: [".js", ".ts", ".tsx", ".json"] },
     module: {
       rules: [
         {
