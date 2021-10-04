@@ -278,6 +278,7 @@ export type Theme = {
   semanticColors: {
     background: string;
     surface: string;
+    left: string;
     surfaceSelected: string;
     textPrimary: string;
     textBackground: string;
@@ -285,6 +286,7 @@ export type Theme = {
     secondary: string;
     dividers: string;
     gain: string;
+    gainLoud: string;
     loss: string;
   };
 };
@@ -313,14 +315,16 @@ const darkTheme: Theme = {
   colors: materialColors,
   semanticColors: {
     background: materialColors.black,
+    left: materialColors.blue_grey_900,
     surface: materialColors.grey_800,
-    surfaceSelected: materialColors.blue_300,
+    surfaceSelected: materialColors.blue_700,
     textPrimary: materialColors.white,
     textBackground: materialColors.grey_500,
     primary: materialColors.blue_600,
     secondary: materialColors.green_600,
     dividers: materialColors.blue_grey_600,
     gain: materialColors.green_600,
+    gainLoud: materialColors.green_a700,
     loss: materialColors.red_600,
   },
 };

@@ -38,19 +38,29 @@ const ColumnSmall = styled(View)({
   alignItems: "flex-end",
 });
 
-const PriceQuote = styled(Text)<{ gain: boolean }>((props) => ({
-  color: props.gain
-    ? props.theme.semanticColors.gain
-    : props.theme.semanticColors.loss,
-  marginLeft: 12,
-}));
+const PriceQuote = styled(Text)<{ selected: boolean; gain: boolean }>(
+  (props) => {
+    return {
+      color: props.gain
+        ? props.selected
+          ? props.theme.semanticColors.gainLoud
+          : props.theme.semanticColors.gain
+        : props.theme.semanticColors.loss,
+      marginLeft: 12,
+    };
+  }
+);
 
-const PctQuote = styled(Text)<{ gain: boolean }>((props) => ({
-  color: props.gain
-    ? props.theme.semanticColors.gain
-    : props.theme.semanticColors.loss,
-  marginLeft: 12,
-}));
+const PctQuote = styled(Text)<{ selected: boolean; gain: boolean }>(
+  (props) => ({
+    color: props.gain
+      ? props.selected
+        ? props.theme.semanticColors.gainLoud
+        : props.theme.semanticColors.gain
+      : props.theme.semanticColors.loss,
+    marginLeft: 12,
+  })
+);
 
 const PriceChangeContainer = styled(View)({ flexDirection: "row" });
 
@@ -115,11 +125,11 @@ export default function WatchlistCell(props: CellProps) {
             </Text>
           )}
           <PriceChangeContainer>
-            <PriceQuote gain={gain} textSize="medium">
+            <PriceQuote selected={selected} gain={gain} textSize="medium">
               {plusOrMinus}
               {Math.abs(quote.price - quote.prevClose).toFixed(2)}
             </PriceQuote>
-            <PctQuote gain={gain} textSize="medium">
+            <PctQuote selected={selected} gain={gain} textSize="medium">
               ({plusOrMinus}
               {(
                 Math.abs((quote.price - quote.prevClose) / quote.prevClose) *

@@ -14,7 +14,6 @@ const StocksContainer = styled(View)((props) => ({
 function Stocks(props: { menuItem: string }) {
   return (
     <StocksContainer>
-      <MenuBar />
       {props.menuItem === "stocks" && <StocksView />}
     </StocksContainer>
   );

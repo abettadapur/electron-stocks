@@ -12,7 +12,7 @@ import { IEXStockQuote } from "frontend/stocks/api/tiingo/models/IEXStockQuote";
 import { getQuotes } from "frontend/stocks/redux/stocks/StocksSelectors";
 import WatchlistCell from "./WatchListCell";
 import SearchBar from "../SearchBar/SearchBar";
-import Collapsible from '../Collapsible/Collapsible';
+import Collapsible from "../Collapsible/Collapsible";
 
 type MappedProps = {
   selectedTicker: string;
@@ -23,7 +23,6 @@ type MappedProps = {
 type Props = MappedProps & typeof Actions;
 
 const WatchlistContainer = styled(View)({
-  borderRight: "1px solid black",
   flex: 1,
   marginLeft: 8,
   marginTop: 8,

@@ -10,11 +10,14 @@ const StocksViewContainer = styled(View)({
   flex: 1,
 });
 
-const LeftContainer = styled(View)({
+const LeftContainer = styled(View)((props) => ({
+  backgroundColor: props.theme.semanticColors.left,
+  paddingTop: 30,
   flex: "0 0 300px",
-});
+}));
 
 const RightContainer = styled(View)({
+  paddingTop: 30,
   flex: 1,
 });
 
